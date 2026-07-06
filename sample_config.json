@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "keyboard": "ansi104",
+  "layers": [
+    {
+      "name": "Default",
+      "mappings": {
+        "caps": "esc",
+        "esc": "grave"
+      }
+    },
+    {
+      "name": "FN",
+      "mappings": {
+        "caps": "layer:1",
+        "space": "modtap:space:lctrl",
+        "enter": "modtap:enter:layer:0",
+        "j": "left",
+        "k": "down",
+        "i": "up",
+        "l": "right",
+        "u": "home",
+        "o": "end",
+        "h": "backspace",
+        "semicolon": "delete",
+        "f1": "n0",
+        "f2": "n1",
+        "f3": "n2",
+        "f4": "n3",
+        "f5": "n4",
+        "f6": "n5",
+        "f7": "n6",
+        "f8": "n7",
+        "f9": "n8",
+        "f10": "n9"
+      }
+    }
+  ]
+}

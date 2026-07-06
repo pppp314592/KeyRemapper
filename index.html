@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KeyRemapper - キーボードリマッパー</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+  <header id="header">
+    <div class="header-left">
+      <h1>⌨ KeyRemapper</h1>
+      <span class="subtitle">キーボードリマッパー</span>
+    </div>
+    <div class="header-center">
+      <div id="kb-selector">
+        <label>配列:</label>
+        <select id="kb-layout-select">
+          <option value="ansi104">ANSI 104（フル）</option>
+          <option value="jis109">JIS 109（フル）</option>
+        </select>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-primary" onclick="importJSON()">📂 JSON読込</button>
+      <button class="btn btn-primary" onclick="exportJSON()">💾 JSON保存</button>
+      <button class="btn btn-accent" onclick="generateAHK(document.getElementById('ahk-show-layer').checked)">⚡ AHK生成</button>
+    </div>
+  </header>
+
+  <div id="main">
+    <aside id="sidebar">
+      <div class="sidebar-header">
+        <h2>レイヤー</h2>
+        <button class="btn btn-small btn-primary" onclick="addLayer()" title="レイヤー追加">＋</button>
+      </div>
+      <ul id="layer-list"></ul>
+      <div class="sidebar-actions">
+        <button class="btn btn-small" onclick="setLayerAllDefault()" title="全キーデフォルト">全てデフォルト</button>
+        <button class="btn btn-small" onclick="setLayerAllTransparent()" title="全キー透過">全て透過</button>
+        <button class="btn btn-small" onclick="setLayerUnmappedDefault()" title="未割当のみデフォルト">割当済み以外デフォルト</button>
+        <button class="btn btn-small" onclick="setLayerUnmappedTransparent()" title="未割当のみ透過">割当済み以外透過</button>
+      </div>
+      <div class="sidebar-footer">
+        <label class="toggle-label">
+          <input type="checkbox" id="toggle-tx" checked onchange="renderKeyboard()">
+          <span>透過キーを表示</span>
+        </label>
+      </div>
+    </aside>
+
+    <section id="content">
+      <div id="keyboard-container">
+        <div id="keyboard"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- Remap Dialog -->
+<div id="remap-dialog" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeRemapDialog()"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="remap-title">キー割当</h3>
+      <button class="btn-close" onclick="closeRemapDialog()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="remap-info">
+        <span id="remap-physical-label" class="key-badge"></span>
+        <span class="arrow">→</span>
+        <span id="remap-current-label" class="key-badge mapped"></span>
+      </div>
+      <div class="remap-options">
+        <label for="remap-type-select">アクション種類:</label>
+        <select id="remap-type-select" onchange="onRemapTypeChange()">
+          <option value="key">キー入力</option>
+          <option value="modtap">ModTap（長押+タップ）</option>
+          <option value="layer">レイヤー切替（MO）</option>
+          <option value="transparent">透過（下位レイヤーへ）</option>
+          <option value="none">無効</option>
+        </select>
+      </div>
+      <div id="remap-key-select" class="remap-options">
+        <label for="remap-key-search">キー検索:</label>
+        <input type="text" id="remap-key-search" placeholder="キー名で検索..." oninput="onRemapSearch()">
+        <div id="remap-key-list"></div>
+      </div>
+      <div id="remap-modtap-select" class="remap-options hidden">
+        <label>タップ時（短押し）:</label>
+        <input type="text" id="remap-modtap-tap" placeholder="キー名で検索..." oninput="onModTapSearch()">
+        <div id="remap-modtap-tap-list" class="remap-sub-list"></div>
+        <label style="margin-top:10px;">長押し時 種類:</label>
+        <select id="remap-modtap-hold-type" onchange="onModTapHoldTypeChange()">
+          <option value="key">キー入力</option>
+          <option value="layer">レイヤー切替（MO）</option>
+        </select>
+        <div id="remap-modtap-hold-key">
+          <label>長押し時キー:</label>
+          <input type="text" id="remap-modtap-hold" placeholder="キー名で検索..." oninput="onModTapSearch()">
+          <div id="remap-modtap-hold-list" class="remap-sub-list"></div>
+        </div>
+        <div id="remap-modtap-hold-layer" class="hidden">
+          <label for="remap-modtap-layer-choice">切替先レイヤー:</label>
+          <select id="remap-modtap-layer-choice"></select>
+        </div>
+      </div>
+      <div id="remap-layer-select" class="remap-options hidden">
+        <label for="remap-layer-choice">切替先レイヤー:</label>
+        <select id="remap-layer-choice"></select>
+      </div>
+      <div class="remap-actions">
+        <button class="btn btn-primary" onclick="applyRemap()">適用</button>
+        <button class="btn" onclick="clearRemap()">解除</button>
+        <button class="btn" onclick="closeRemapDialog()">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="ahk-overlay" class="modal hidden">
+  <div class="modal-backdrop"></div>
+  <div class="modal-content modal-xl">
+    <div class="modal-header">
+      <h3>AHK生成結果</h3>
+      <button class="btn-close" id="ahk-close-btn">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="ahk-msg" class="ahk-msg hidden">ダウンロードしました。ファイルを開いて実行してください。</div>
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-dim);margin-bottom:6px;cursor:pointer">
+        <input type="checkbox" id="ahk-show-layer" checked>
+        レイヤー切替時にマウス位置にToolTip（3秒）
+      </label>
+      <textarea id="ahk-text" class="ahk-textarea" readonly></textarea>
+      <div class="ahk-actions">
+        <button class="btn" id="ahk-save-btn">保存</button>
+        <button class="btn" id="ahk-cancel-btn">キャンセル</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
