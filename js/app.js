@@ -963,7 +963,7 @@ function generateAHK(showLayerDisplay) {
     script += `  if (CurrentLayer != _PrevLayer) {\n`;
     script += `    _PrevLayer := CurrentLayer\n`;
     script += `    if (CurrentLayer != 0) {\n`;
-    script += `      CaretGetPos, cx, cy\n`;
+    script += `      Gosub, _GetCaretPos\n`;
     script += `      ToolTip, % "Layer: " CurrentLayer, % cx+20, % cy+20\n`;
     script += `      SetTimer, _HideLayerTip, -3000\n`;
     script += `    } else {\n`;
@@ -971,8 +971,17 @@ function generateAHK(showLayerDisplay) {
     script += `      SetTimer, _HideLayerTip, Off\n`;
     script += `    }\n`;
     script += `  } else if (CurrentLayer != 0) {\n`;
-    script += `    CaretGetPos, cx, cy\n`;
+    script += `    Gosub, _GetCaretPos\n`;
     script += `    ToolTip, % "Layer: " CurrentLayer, % cx+20, % cy+20\n`;
+    script += `  }\n`;
+    script += `return\n`;
+    script += `_GetCaretPos:\n`;
+    script += `  cx := 0, cy := 0\n`;
+    script += `  VarSetCapacity(pt, 8, 0)\n`;
+    script += `  if DllCall("GetCaretPos", "Ptr", &pt) {\n`;
+    script += `    DllCall("ClientToScreen", "Ptr", DllCall("GetFocus", "Ptr"), "Ptr", &pt)\n`;
+    script += `    cx := NumGet(pt, 0, "Int")\n`;
+    script += `    cy := NumGet(pt, 4, "Int")\n`;
     script += `  }\n`;
     script += `return\n`;
     script += `_HideLayerTip:\n`;
