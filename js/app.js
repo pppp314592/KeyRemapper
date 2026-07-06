@@ -963,13 +963,16 @@ function generateAHK(showLayerDisplay) {
     script += `  if (CurrentLayer != _PrevLayer) {\n`;
     script += `    _PrevLayer := CurrentLayer\n`;
     script += `    if (CurrentLayer != 0) {\n`;
-    script += `      MouseGetPos, mx, my\n`;
-    script += `      ToolTip, % "Layer: " CurrentLayer, % mx+16, % my+16\n`;
+    script += `      CaretGetPos, cx, cy\n`;
+    script += `      ToolTip, % "Layer: " CurrentLayer, % cx+20, % cy+20\n`;
     script += `      SetTimer, _HideLayerTip, -3000\n`;
     script += `    } else {\n`;
     script += `      ToolTip\n`;
     script += `      SetTimer, _HideLayerTip, Off\n`;
     script += `    }\n`;
+    script += `  } else if (CurrentLayer != 0) {\n`;
+    script += `    CaretGetPos, cx, cy\n`;
+    script += `    ToolTip, % "Layer: " CurrentLayer, % cx+20, % cy+20\n`;
     script += `  }\n`;
     script += `return\n`;
     script += `_HideLayerTip:\n`;
