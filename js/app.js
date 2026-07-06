@@ -896,7 +896,7 @@ function importJSON() {
 }
 
 // ---- AHK 生成 ----
-function generateAHK(showLayerDisplay) {
+function generateAHK() {
   let script = '';
   script += `; ============================================================\n`;
   script += `; KeyRemapper - 生成された AutoHotkey スクリプト\n`;
@@ -912,12 +912,7 @@ function generateAHK(showLayerDisplay) {
   script += `global CurrentLayer := 0\n`;
   script += `global _MT_anykey := 0\n`;
   script += `global _MO_base := 0\n`;
-  script += `global _MO_count := 0\n`;
-  if (showLayerDisplay) {
-    script += `global _PrevLayer := 0\n\n`;
-  } else {
-    script += `\n`;
-  }
+  script += `global _MO_count := 0\n\n`;
 
   // ガード変数（オートリピート対策）
   const guardKeys = new Set();
@@ -952,41 +947,6 @@ function generateAHK(showLayerDisplay) {
     if (!k) return keyId;
     if (map[keyId]) return map[keyId];
     return k.ahk;
-  }
-
-  // レイヤー切替表示（auto-execute section 内に配置）
-  if (showLayerDisplay) {
-    script += `; === レイヤー切替表示 ===\n`;
-    script += `SetTimer, _CheckLayer, 200\n`;
-    script += `return\n\n`;
-    script += `_CheckLayer:\n`;
-    script += `  if (CurrentLayer != _PrevLayer) {\n`;
-    script += `    _PrevLayer := CurrentLayer\n`;
-    script += `    if (CurrentLayer != 0) {\n`;
-    script += `      Gosub, _GetCaretPos\n`;
-    script += `      ToolTip, % "Layer: " CurrentLayer, % cx+20, % cy+20\n`;
-    script += `      SetTimer, _HideLayerTip, -3000\n`;
-    script += `    } else {\n`;
-    script += `      ToolTip\n`;
-    script += `      SetTimer, _HideLayerTip, Off\n`;
-    script += `    }\n`;
-    script += `  } else if (CurrentLayer != 0) {\n`;
-    script += `    Gosub, _GetCaretPos\n`;
-    script += `    ToolTip, % "Layer: " CurrentLayer, % cx+20, % cy+20\n`;
-    script += `  }\n`;
-    script += `return\n`;
-    script += `_GetCaretPos:\n`;
-    script += `  cx := 0, cy := 0\n`;
-    script += `  VarSetCapacity(pt, 8, 0)\n`;
-    script += `  if DllCall("GetCaretPos", "Ptr", &pt) {\n`;
-    script += `    DllCall("ClientToScreen", "Ptr", DllCall("GetFocus", "Ptr"), "Ptr", &pt)\n`;
-    script += `    cx := NumGet(pt, 0, "Int")\n`;
-    script += `    cy := NumGet(pt, 4, "Int")\n`;
-    script += `  }\n`;
-    script += `return\n`;
-    script += `_HideLayerTip:\n`;
-    script += `  ToolTip\n`;
-    script += `return\n\n`;
   }
 
   // === レイヤーマッピング（#If 内） — $* で統一 ===
@@ -1121,17 +1081,6 @@ function generateAHK(showLayerDisplay) {
     script += `\n`;
   }
 
-  // デバッグホットキー（常時表示OFF時用）
-  if (!showLayerDisplay) {
-    script += `; === デバッグ (Ctrl+Shift+D でレイヤー表示) ===\n`;
-    script += `^+d::\n`;
-    script += `  ToolTip Layer: %CurrentLayer%\n`;
-    script += `  SetTimer RemoveToolTip, -2000\n`;
-    script += `return\n\n`;
-    script += `RemoveToolTip:\n`;
-    script += `  ToolTip\n`;
-    script += `return\n`;
-  }
   script += `\n; === 以上 自動生成 ===\n`;
 
   // 確認ダイアログを表示
@@ -1167,6 +1116,7 @@ function generateAHK(showLayerDisplay) {
   saveBtn.onclick = () => {
     const blob = prepareBlob();
     downloadBlob(blob, 'keyremapper.ahk');
+    cleanup();
   };
 
   document.getElementById('ahk-close-btn').onclick = cleanup;

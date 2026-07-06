@@ -25,7 +25,7 @@
     <div class="header-right">
       <button class="btn btn-primary" onclick="importJSON()">📂 JSON読込</button>
       <button class="btn btn-primary" onclick="exportJSON()">💾 JSON保存</button>
-      <button class="btn btn-accent" onclick="generateAHK(document.getElementById('ahk-show-layer').checked)">⚡ AHK生成</button>
+      <button class="btn btn-accent" onclick="generateAHK()">⚡ AHK生成</button>
     </div>
   </header>
 
@@ -127,11 +127,6 @@
       <button class="btn-close" id="ahk-close-btn">✕</button>
     </div>
     <div class="modal-body">
-      <div id="ahk-msg" class="ahk-msg hidden">ダウンロードしました。ファイルを開いて実行してください。</div>
-      <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-dim);margin-bottom:6px;cursor:pointer">
-        <input type="checkbox" id="ahk-show-layer" checked>
-        レイヤー切替時にマウス位置にToolTip（3秒）
-      </label>
       <textarea id="ahk-text" class="ahk-textarea" readonly></textarea>
       <div class="ahk-actions">
         <button class="btn" id="ahk-save-btn">保存</button>
