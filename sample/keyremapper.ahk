@@ -1,6 +1,6 @@
 ﻿; ============================================================
 ; KeyRemapper - 生成された AutoHotkey スクリプト
-; 生成日時: 2026/7/6 16:02:14
+; 生成日時: 2026/7/6 16:10:28
 ; キーボード: JIS 109（フル）
 ; ============================================================
 
@@ -8,12 +8,17 @@
 #Persistent
 #NoEnv
 #Warn
+#MaxThreadsPerHotkey, 20
 
 ; === レイヤー状態 ===
 global CurrentLayer := 0
 global _MT_anykey := 0
 global _MO_base := 0
 global _MO_count := 0
+
+; === ガード変数 ===
+_busy_space := false
+_busy_f := false
 
 ; === レイヤー定義 ===
 ; Layer 0: Default
@@ -23,7 +28,16 @@ global _MO_count := 0
 ; === Layer 0: Default ===
 #If (CurrentLayer = 0)
   ; ModTap: Space -> tap=Space, hold=MO(1)
-  $Space::
+  $*Space::
+    global _busy_space
+    if GetKeyState("Shift") or GetKeyState("Ctrl") or GetKeyState("Alt") or GetKeyState("LWin") or GetKeyState("RWin")
+    {
+      Send {Blind}{Space}
+      return
+    }
+    if (_busy_space)
+      return
+    _busy_space := true
     _MT_space_held := false
     _MT_anykey := 0
     _MO_count++
@@ -44,7 +58,16 @@ global _MO_count := 0
     _MT_space_held := true
   return
   ; ModTap: f -> tap=f, hold=MO(2)
-  $f::
+  $*f::
+    global _busy_f
+    if GetKeyState("Shift") or GetKeyState("Ctrl") or GetKeyState("Alt") or GetKeyState("LWin") or GetKeyState("RWin")
+    {
+      Send {Blind}{f}
+      return
+    }
+    if (_busy_f)
+      return
+    _busy_f := true
     _MT_f_held := false
     _MT_anykey := 0
     _MO_count++
@@ -68,151 +91,151 @@ global _MO_count := 0
 
 ; === Layer 1: Layer 1 ===
 #If (CurrentLayer = 1)
-  $0::
+  $*0::
     _MT_anykey := 1
     SendInput {Blind}{F10}
   return
-  $1::
+  $*1::
     _MT_anykey := 1
     SendInput {Blind}{F1}
   return
-  $2::
+  $*2::
     _MT_anykey := 1
     SendInput {Blind}{F2}
   return
-  $3::
+  $*3::
     _MT_anykey := 1
     SendInput {Blind}{F3}
   return
-  $4::
+  $*4::
     _MT_anykey := 1
     SendInput {Blind}{F4}
   return
-  $5::
+  $*5::
     _MT_anykey := 1
     SendInput {Blind}{F5}
   return
-  $6::
+  $*6::
     _MT_anykey := 1
     SendInput {Blind}{F6}
   return
-  $7::
+  $*7::
     _MT_anykey := 1
     SendInput {Blind}{F7}
   return
-  $8::
+  $*8::
     _MT_anykey := 1
     SendInput {Blind}{F8}
   return
-  $9::
+  $*9::
     _MT_anykey := 1
     SendInput {Blind}{F9}
   return
-  $i::
+  $*i::
     _MT_anykey := 1
     SendInput {Blind}{Up}
   return
-  $j::
+  $*j::
     _MT_anykey := 1
     SendInput {Blind}{Left}
   return
-  $k::
+  $*k::
     _MT_anykey := 1
     SendInput {Blind}{Down}
   return
-  $l::
+  $*l::
     _MT_anykey := 1
     SendInput {Blind}{Right}
   return
-  $p::
+  $*p::
     _MT_anykey := 1
     SendInput {Blind}{Backspace}
   return
-  $u::
+  $*u::
     _MT_anykey := 1
     SendInput {Blind}{Home}
   return
-  $o::
+  $*o::
     _MT_anykey := 1
     SendInput {Blind}{End}
   return
-  $q::
+  $*q::
     _MT_anykey := 1
     SendInput {Blind}{1}
   return
-  $w::
+  $*w::
     _MT_anykey := 1
     SendInput {Blind}{2}
   return
-  $e::
+  $*e::
     _MT_anykey := 1
     SendInput {Blind}{3}
   return
-  $r::
+  $*r::
     _MT_anykey := 1
     SendInput {Blind}{4}
   return
-  $t::
+  $*t::
     _MT_anykey := 1
     SendInput {Blind}{5}
   return
-  $n::
+  $*n::
     _MT_anykey := 1
     SendInput {Blind}{SC07B}
   return
-  $m::
+  $*m::
     _MT_anykey := 1
     SendInput {Blind}{SC079}
   return
-  $/::
+  $*/::
     _MT_anykey := 1
     SendInput {Blind}{\}
   return
-  $a::
+  $*a::
     _MT_anykey := 1
     SendInput {Blind}{6}
   return
-  $s::
+  $*s::
     _MT_anykey := 1
     SendInput {Blind}{7}
   return
-  $d::
+  $*d::
     _MT_anykey := 1
     SendInput {Blind}{8}
   return
-  $f::
+  $*f::
     _MT_anykey := 1
     SendInput {Blind}{9}
   return
-  $g::
+  $*g::
     _MT_anykey := 1
     SendInput {Blind}{0}
   return
-  $sc00d::
+  $*sc00d::
     _MT_anykey := 1
     SendInput {Blind}{F12}
   return
-  $-::
+  $*-::
     _MT_anykey := 1
     SendInput {Blind}{F11}
   return
-  $h::
+  $*h::
     _MT_anykey := 1
     SendInput {Blind}{Delete}
   return
-  $z::
+  $*z::
     _MT_anykey := 1
     SendInput {Blind}{-}
   return
-  $x::
+  $*x::
     _MT_anykey := 1
     SendInput {Blind}{sc00d}
   return
-  $c::
+  $*c::
     _MT_anykey := 1
     SendInput {Blind}{\}
   return
-  $sc027::
+  $*sc027::
     _MT_anykey := 1
     SendInput {Blind}{Enter}
   return
@@ -220,55 +243,63 @@ global _MO_count := 0
 
 ; === Layer 2: Layer 2 ===
 #If (CurrentLayer = 2)
-  $Space::
+  $*Space::
     _MT_anykey := 1
     SendInput {Blind}{Numpad0}
   return
-  $j::
+  $*j::
     _MT_anykey := 1
     SendInput {Blind}{Numpad4}
   return
-  $m::
+  $*m::
     _MT_anykey := 1
     SendInput {Blind}{Numpad1}
   return
-  $,::
+  $*,::
     _MT_anykey := 1
     SendInput {Blind}{Numpad2}
   return
-  $.::
+  $*.::
     _MT_anykey := 1
     SendInput {Blind}{Numpad3}
   return
-  $k::
+  $*k::
     _MT_anykey := 1
     SendInput {Blind}{Numpad5}
   return
-  $l::
+  $*l::
     _MT_anykey := 1
     SendInput {Blind}{Numpad6}
   return
-  $u::
+  $*u::
     _MT_anykey := 1
     SendInput {Blind}{Numpad7}
   return
-  $i::
+  $*i::
     _MT_anykey := 1
     SendInput {Blind}{Numpad8}
   return
-  $o::
+  $*o::
     _MT_anykey := 1
     SendInput {Blind}{Numpad9}
   return
-  $p::
+  $*p::
     _MT_anykey := 1
     SendInput {Blind}{Backspace}
   return
-  $sc027::
+  $*sc027::
     _MT_anykey := 1
     SendInput {Blind}{NumpadEnter}
   return
 #If
+
+; === ガードクリア（キーUP時） ===
+$Space up::
+  _busy_space := false
+return
+$f up::
+  _busy_f := false
+return
 
 
 ; === 以上 自動生成 ===
