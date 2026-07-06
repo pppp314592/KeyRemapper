@@ -1,6 +1,6 @@
 ﻿; ============================================================
 ; KeyRemapper - 生成された AutoHotkey スクリプト
-; 生成日時: 2026/7/6 17:09:19
+; 生成日時: 2026/7/6 17:53:00
 ; キーボード: JIS 109（フル）
 ; ============================================================
 
@@ -151,6 +151,10 @@ _busy_f := false
     _MT_anykey := 1
     SendInput {Blind}{Backspace}
   return
+  $*'::
+    _MT_anykey := 1
+    SendInput {Blind}{]}
+  return
   $*u::
     _MT_anykey := 1
     SendInput {Blind}{Home}
@@ -223,6 +227,18 @@ _busy_f := false
     _MT_anykey := 1
     SendInput {Blind}{Delete}
   return
+  $*SC01A::
+    _MT_anykey := 1
+    SendInput {Blind}{[}
+  return
+  $*[::
+    _MT_anykey := 1
+    SendInput {Blind}{Volume_Up}
+  return
+  $*]::
+    _MT_anykey := 1
+    SendInput {Blind}{Volume_Down}
+  return
   $*z::
     _MT_anykey := 1
     SendInput {Blind}{-}
@@ -241,11 +257,11 @@ _busy_f := false
   return
   $*,::
     _MT_anykey := 1
-    SendInput {Blind}{PgUp}
+    SendInput {Blind}{<}
   return
   $*.::
     _MT_anykey := 1
-    SendInput {Blind}{PgDn}
+    SendInput {Blind}{>}
   return
 #If
 

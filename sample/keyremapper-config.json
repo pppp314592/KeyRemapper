@@ -27,7 +27,7 @@
         "k": "down",
         "l": "right",
         "p": "backspace",
-        "colon_jis": "transparent",
+        "colon_jis": "rbracket_jis",
         "u": "home",
         "o": "end",
         "q": "1",
@@ -67,9 +67,9 @@
         "backspace": "transparent",
         "tab": "transparent",
         "y": "transparent",
-        "at_mark": "transparent",
-        "lbracket_jis": "lbracket_jis",
-        "rbracket_jis": "rbracket_jis",
+        "at_mark": "lbracket_jis",
+        "lbracket_jis": "volume_up",
+        "rbracket_jis": "volume_down",
         "caps": "transparent",
         "enter": "transparent",
         "lshift": "transparent",
@@ -119,8 +119,8 @@
         "n0": "transparent",
         "ndot": "transparent",
         "semicolon": "enter",
-        "comma": "pgup",
-        "dot": "pgdn"
+        "comma": "less_than",
+        "dot": "greater_than"
       }
     },
     {
