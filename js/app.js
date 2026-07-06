@@ -906,31 +906,12 @@ function generateAHK() {
   script += `#SingleInstance Force\n`;
   script += `#Persistent\n`;
   script += `#NoEnv\n`;
-  script += `#Warn\n`;
-  script += `#MaxThreadsPerHotkey, 20\n\n`;
+  script += `#Warn\n\n`;
   script += `; === レイヤー状態 ===\n`;
   script += `global CurrentLayer := 0\n`;
   script += `global _MT_anykey := 0\n`;
   script += `global _MO_base := 0\n`;
   script += `global _MO_count := 0\n\n`;
-
-  // ガード変数（オートリピート対策）
-  const guardKeys = new Set();
-  state.layers.forEach((layer) => {
-    Object.entries(layer.mappings).forEach(([phys, mapping]) => {
-      if (mapping.startsWith('layer:') || mapping.startsWith('modtap:')) {
-        guardKeys.add(phys);
-      }
-    });
-  });
-  if (guardKeys.size > 0) {
-    script += `; === ガード変数 ===\n`;
-    guardKeys.forEach(phys => {
-      const safe = phys.replace(/[^a-zA-Z0-9_]/g, '_');
-      script += `_busy_${safe} := false\n`;
-    });
-    script += `\n`;
-  }
 
   // レイヤー定義コメント
   script += `; === レイヤー定義 ===\n`;
@@ -963,16 +944,11 @@ function generateAHK() {
     script += `; === Layer ${li}: ${layer.name} ===\n`;
     script += `#If (CurrentLayer = ${li})\n`;
 
-    // MO keys — $* プリフィクス
+    // MO keys — $ プリフィクス（#If内のため$*不要）
     moKeys.forEach(([phys, mapping]) => {
       const keyName = ahkName(phys);
-      const safePhys = phys.replace(/[^a-zA-Z0-9_]/g, '_');
       const targetLayer = parseInt(mapping.split(':')[1]);
-      script += `  $*${keyName}::\n`;
-      script += `    global _busy_${safePhys}\n`;
-      script += `    if (_busy_${safePhys})\n`;
-      script += `      return\n`;
-      script += `    _busy_${safePhys} := true\n`;
+      script += `  $${keyName}::\n`;
       script += `    _MO_count++\n`;
       script += `    if (_MO_count = 1)\n`;
       script += `      _MO_base := CurrentLayer\n`;
@@ -985,7 +961,7 @@ function generateAHK() {
       script += `  return\n`;
     });
 
-    // ModTap mappings — $* プリフィクス
+    // ModTap mappings — $ プリフィクス
     modtapMappings.forEach(([phys, mapping]) => {
       const parts = mapping.split(':');
       const physName = ahkName(phys);
@@ -995,11 +971,7 @@ function generateAHK() {
       script += `  ; ModTap: ${physName} -> tap=${tapName}`;
       if (parts[2] === 'layer') {
         script += `, hold=MO(${parts[3]})\n`;
-        script += `  $*${physName}::\n`;
-        script += `    global _busy_${safePhys}\n`;
-        script += `    if (_busy_${safePhys})\n`;
-        script += `      return\n`;
-        script += `    _busy_${safePhys} := true\n`;
+        script += `  $${physName}::\n`;
         script += `    _MT_${safePhys}_held := false\n`;
         script += `    _MT_anykey := 0\n`;
         script += `    _MO_count++\n`;
@@ -1022,11 +994,7 @@ function generateAHK() {
       } else {
         const holdName = ahkName(parts[2]);
         script += `, hold=${holdName}\n`;
-        script += `  $*${physName}::\n`;
-        script += `    global _busy_${safePhys}\n`;
-        script += `    if (_busy_${safePhys})\n`;
-        script += `      return\n`;
-        script += `    _busy_${safePhys} := true\n`;
+        script += `  $${physName}::\n`;
         script += `    _MT_anykey := 1\n`;
         script += `    KeyWait, ${physName}, T0.2\n`;
         script += `    if (ErrorLevel) {\n`;
@@ -1048,15 +1016,15 @@ function generateAHK() {
         const mapName = ahkName(mapping);
         if (physName !== mapName) {
           if (modSet.has(mapName)) {
-            script += `  $*${physName}::\n`;
+            script += `  $${physName}::\n`;
             script += `    _MT_anykey := 1\n`;
             script += `    Send {Blind}{${mapName} DownR}\n`;
             script += `  return\n`;
-            script += `  $*${physName} up::\n`;
+            script += `  $${physName} up::\n`;
             script += `    Send {Blind}{${mapName} Up}\n`;
             script += `  return\n`;
           } else {
-            script += `  $*${physName}::\n`;
+            script += `  $${physName}::\n`;
             script += `    _MT_anykey := 1\n`;
             script += `    SendInput {Blind}{${mapName}}\n`;
             script += `  return\n`;
@@ -1066,19 +1034,6 @@ function generateAHK() {
     }
 
     script += `#If\n\n`;
-  }
-
-  // === $key up:: ガードクリア（無条件）===
-  if (guardKeys.size > 0) {
-    script += `; === ガードクリア（キーUP時） ===\n`;
-    guardKeys.forEach(phys => {
-      const keyName = ahkName(phys);
-      script += `$${keyName} up::\n`;
-      const safe = phys.replace(/[^a-zA-Z0-9_]/g, '_');
-      script += `  _busy_${safe} := false\n`;
-      script += `return\n`;
-    });
-    script += `\n`;
   }
 
   script += `\n; === 以上 自動生成 ===\n`;
