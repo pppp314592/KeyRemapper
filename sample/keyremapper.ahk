@@ -1,6 +1,6 @@
 ﻿; ============================================================
 ; KeyRemapper - 生成された AutoHotkey スクリプト
-; 生成日時: 2026/7/6 16:10:28
+; 生成日時: 2026/7/6 17:09:19
 ; キーボード: JIS 109（フル）
 ; ============================================================
 
@@ -238,6 +238,14 @@ _busy_f := false
   $*sc027::
     _MT_anykey := 1
     SendInput {Blind}{Enter}
+  return
+  $*,::
+    _MT_anykey := 1
+    SendInput {Blind}{PgUp}
+  return
+  $*.::
+    _MT_anykey := 1
+    SendInput {Blind}{PgDn}
   return
 #If
 

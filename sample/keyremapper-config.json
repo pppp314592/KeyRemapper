@@ -37,8 +37,6 @@
         "t": "5",
         "n": "muhenkan",
         "m": "henkan",
-        "comma": "comma",
-        "dot": "dot",
         "slash": "backslash",
         "a": "6",
         "s": "7",
@@ -120,7 +118,9 @@
         "nenter": "transparent",
         "n0": "transparent",
         "ndot": "transparent",
-        "semicolon": "enter"
+        "semicolon": "enter",
+        "comma": "pgup",
+        "dot": "pgdn"
       }
     },
     {

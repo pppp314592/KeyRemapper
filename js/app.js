@@ -126,6 +126,36 @@ const KEY_DEFS = [
   { id:'ndiv', label:'N/', category:'テンキー', ahk:'NumpadDiv' },
   { id:'nenter', label:'NEnt', category:'テンキー', ahk:'NumpadEnter' },
   { id:'nlock', label:'NumLk', category:'テンキー', ahk:'NumLock' },
+
+  // メディアキー
+  { id:'volume_up', label:'VolUp', category:'メディア', ahk:'Volume_Up' },
+  { id:'volume_down', label:'VolDown', category:'メディア', ahk:'Volume_Down' },
+  { id:'volume_mute', label:'VolMute', category:'メディア', ahk:'Volume_Mute' },
+  { id:'media_next', label:'Next曲', category:'メディア', ahk:'Media_Next' },
+  { id:'media_prev', label:'前曲', category:'メディア', ahk:'Media_Prev' },
+  { id:'media_play', label:'再生/停止', category:'メディア', ahk:'Media_Play_Pause' },
+  { id:'media_stop', label:'停止', category:'メディア', ahk:'Media_Stop' },
+
+  // 記号（Shift+数字などで入力される文字）
+  { id:'exclaim', label:'!', category:'記号', ahk:'!' },
+  { id:'dquote', label:'"', category:'記号', ahk:'"' },
+  { id:'hash', label:'#', category:'記号', ahk:'#' },
+  { id:'dollar', label:'$', category:'記号', ahk:'$' },
+  { id:'percent', label:'%', category:'記号', ahk:'%' },
+  { id:'ampersand', label:'&', category:'記号', ahk:'&' },
+  { id:'asterisk', label:'*', category:'記号', ahk:'*' },
+  { id:'lparen', label:'(', category:'記号', ahk:'(' },
+  { id:'rparen', label:')', category:'記号', ahk:')' },
+  { id:'underscore', label:'_', category:'記号', ahk:'_' },
+  { id:'plus', label:'+', category:'記号', ahk:'+' },
+  { id:'less_than', label:'<', category:'記号', ahk:'<' },
+  { id:'greater_than', label:'>', category:'記号', ahk:'>' },
+  { id:'colon', label:':', category:'記号', ahk:':' },
+  { id:'question', label:'?', category:'記号', ahk:'?' },
+  { id:'at_sign', label:'@', category:'記号', ahk:'@' },
+  { id:'caret_sym', label:'^', category:'記号', ahk:'^' },
+  { id:'tilde', label:'~', category:'記号', ahk:'~' },
+  { id:'pipe', label:'|', category:'記号', ahk:'|' },
 ];
 
 const KEY_DEF_MAP = {};
