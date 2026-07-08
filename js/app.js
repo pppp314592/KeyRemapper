@@ -973,7 +973,7 @@ function generateAHK(version) {
 
 function buildScript(isV2) {
   const EQ = isV2 ? '==' : '=';
-  const HO = (n, up) => isV2 ? `$${n}${up?' up':''}:: {\n` : `$${n}${up?' up':''}::\n`;
+  const HO = (n, up) => isV2 ? `$*${n}${up?' up':''}:: {\n` : `$*${n}${up?' up':''}::\n`;
   const HC = isV2 ? '}\n' : '  return\n';
   const KW = (k) => isV2 ? `  KeyWait("${k}")\n` : `  KeyWait, ${k}\n`;
   const KWT = (k,t) => isV2 ? `  KeyWait("${k}","T${t}")\n` : `  KeyWait, ${k}, T${t}\n`;
