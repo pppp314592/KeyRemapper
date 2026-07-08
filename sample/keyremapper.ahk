@@ -1,6 +1,6 @@
 ﻿; ============================================================
 ; KeyRemapper - 生成された AutoHotkey スクリプト
-; 生成日時: 2026/7/8 11:43:20
+; 生成日時: 2026/7/8 11:51:33
 ; キーボード: JIS 109（フル）
 ; ============================================================
 
@@ -20,7 +20,6 @@ global _MO_count := 0
 _busy_space := false
 _busy_f := false
 _busy_semicolon := false
-_busy_ralt := false
 
 ; === レイヤー定義 ===
 ; Layer 0: Default
@@ -103,22 +102,6 @@ _busy_ralt := false
   return
   _MT_semicolon_chk:
     _MT_semicolon_held := true
-  return
-  ; ModTap: RAlt -> tap=RAlt, hold=RAlt
-  $*RAlt::
-    global _busy_ralt
-    if (_busy_ralt)
-      return
-    _busy_ralt := true
-    _MT_anykey := 1
-    KeyWait, RAlt, T0.2
-    if (ErrorLevel) {
-      Send {Blind}{RAlt DownR}
-      KeyWait, RAlt
-      Send {Blind}{RAlt Up}
-    } else {
-      SendInput {Blind}{RAlt}
-    }
   return
 #If
 
@@ -359,9 +342,6 @@ $f up::
 return
 $sc027 up::
   _busy_semicolon := false
-return
-$RAlt up::
-  _busy_ralt := false
 return
 
 

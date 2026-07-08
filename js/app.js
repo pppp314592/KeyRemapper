@@ -926,232 +926,188 @@ function importJSON() {
 }
 
 // ---- AHK 生成 ----
-function generateAHK() {
-  let script = '';
-  script += `; ============================================================\n`;
-  script += `; KeyRemapper - 生成された AutoHotkey スクリプト\n`;
-  script += `; 生成日時: ${new Date().toLocaleString()}\n`;
-  script += `; キーボード: ${getLayout().name}\n`;
-  script += `; ============================================================\n\n`;
-  script += `#SingleInstance Force\n`;
-  script += `#Persistent\n`;
-  script += `#NoEnv\n`;
-  script += `#Warn\n`;
-  script += `#MaxThreadsPerHotkey, 20\n\n`;
-  script += `; === レイヤー状態 ===\n`;
-  script += `global CurrentLayer := 0\n`;
-  script += `global _MT_anykey := 0\n`;
-  script += `global _MO_base := 0\n`;
-  script += `global _MO_count := 0\n\n`;
+let _ahkV1 = '', _ahkV2 = '';
 
-  // ガード変数（KeyWait使用ハンドラ用）
+function switchAhkTab(ver) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('tab-active', +b.dataset.version === ver));
+  const t = document.getElementById('ahk-text');
+  t.value = ver === 1 ? _ahkV1 : _ahkV2;
+  t.scrollTop = 0;
+}
+
+function generateAHK(version) {
+  _ahkV1 = buildScript(1);
+  _ahkV2 = buildScript(2);
+
+  const overlay = document.getElementById('ahk-overlay');
+  const textarea = document.getElementById('ahk-text');
+  const saveBtn = document.getElementById('ahk-save-btn');
+
+  switchAhkTab(version);
+
+  const cleanup = () => overlay.classList.add('hidden');
+
+  const prepareBlob = () => {
+    const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+    const enc = new TextEncoder().encode(textarea.value);
+    const combined = new Uint8Array(bom.length + enc.length);
+    combined.set(bom); combined.set(enc, bom.length);
+    return new Blob([combined], { type:'text/plain;charset=utf-8' });
+  };
+  const downloadBlob = (blob, name) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = name; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  saveBtn.onclick = () => {
+    downloadBlob(prepareBlob(), 'keyremapper.ahk');
+    cleanup();
+  };
+
+  document.getElementById('ahk-close-btn').onclick = cleanup;
+  document.getElementById('ahk-cancel-btn').onclick = cleanup;
+  overlay.classList.remove('hidden');
+}
+
+function buildScript(isV2) {
+  const EQ = isV2 ? '==' : '=';
+  const HO = (n, up) => isV2 ? `$${n}${up?' up':''}:: {\n` : `$${n}${up?' up':''}::\n`;
+  const HC = isV2 ? '}\n' : '  return\n';
+  const KW = (k) => isV2 ? `  KeyWait("${k}")\n` : `  KeyWait, ${k}\n`;
+  const KWT = (k,t) => isV2 ? `  KeyWait("${k}","T${t}")\n` : `  KeyWait, ${k}, T${t}\n`;
+  const SND = (k) => isV2 ? `  SendInput("{Blind}{${k}}")\n` : `  SendInput {Blind}{${k}}\n`;
+  const SDW = (m) => isV2 ? `  Send("{Blind}{${m} DownR}")\n` : `  Send {Blind}{${m} DownR}\n`;
+  const SUP = (m) => isV2 ? `  Send("{Blind}{${m} Up}")\n` : `  Send {Blind}{${m} Up}\n`;
+  const ST = (n,ms) => isV2 ? `  SetTimer(${n},${ms})\n` : `  SetTimer, ${n}, ${ms}\n`;
+  const SO = (n) => isV2 ? `  SetTimer(${n},0)\n` : `  SetTimer, ${n}, Off\n`;
+  const FN = (n) => isV2 ? `${n}() {\n` : `${n}:\n`;
+
+  let s = '';
+  s += `; ============================================================\n`;
+  s += `; KeyRemapper - AutoHotkey ${isV2?'v2':'v1'}\n`;
+  s += `; ${new Date().toLocaleString()} | ${getLayout().name}\n`;
+  s += `; ============================================================\n\n`;
+  s += `#SingleInstance Force\n`;
+  if (!isV2) s += `#Persistent\n#NoEnv\n#MaxThreadsPerHotkey, 20\n`;
+  s += `#Warn\n\n`;
+
+  s += `; === レイヤー状態 ===\n`;
+  s += isV2 ? `CurrentLayer := 0\n_MT_anykey := 0\n_MO_base := 0\n_MO_count := 0\n\n`
+            : `global CurrentLayer := 0\nglobal _MT_anykey := 0\nglobal _MO_base := 0\nglobal _MO_count := 0\n\n`;
+
+  // ガード変数
   const guardKeys = new Set();
-  state.layers.forEach((layer) => {
-    Object.entries(layer.mappings).forEach(([phys, mapping]) => {
-      if (mapping.startsWith('layer:') || mapping.startsWith('modtap:'))
-        guardKeys.add(phys);
-    });
-  });
+  state.layers.forEach(l => Object.entries(l.mappings).forEach(([p,m]) => {
+    if (m.startsWith('layer:') || m.startsWith('modtap:')) guardKeys.add(p);
+  }));
   if (guardKeys.size > 0) {
-    script += `; === ガード変数 ===\n`;
-    guardKeys.forEach(phys => {
-      const safe = phys.replace(/[^a-zA-Z0-9_]/g, '_');
-      script += `_busy_${safe} := false\n`;
-    });
-    script += `\n`;
+    s += `; === ガード変数 ===\n`;
+    guardKeys.forEach(p => { s += `_busy_${p.replace(/[^a-zA-Z0-9_]/g,'_')} := false\n`; });
+    s += `\n`;
   }
 
-  // レイヤー定義コメント
-  script += `; === レイヤー定義 ===\n`;
-  state.layers.forEach((l, i) => { script += `; Layer ${i}: ${l.name}\n`; });
-  script += `\n`;
+  s += `; === レイヤー定義 ===\n`;
+  state.layers.forEach((l,i) => { s += `; Layer ${i}: ${l.name}\n`; });
+  s += `\n`;
 
-  // AHK セーフなキー名
   function ahkName(keyId) {
-    const map = {
-      grave:'SC029', minus:'-', equal:'=', lbracket:'[', rbracket:']',
-      backslash:'\\', semicolon:'sc027', quote:"'", comma:',', dot:'.', slash:'/',
-    };
+    const map = { grave:'SC029', minus:'-', equal:'=', lbracket:'[', rbracket:']',
+      backslash:'\\', semicolon:'sc027', quote:"'", comma:',', dot:'.', slash:'/' };
     const k = KEY_DEF_MAP[keyId];
     if (!k) return keyId;
     if (map[keyId]) return map[keyId];
     return k.ahk;
   }
 
-  // === レイヤーマッピング（#If 内） — $* 統一 ===
   for (let li = 0; li < state.layers.length; li++) {
     const layer = state.layers[li];
     const entries = Object.entries(layer.mappings);
-    const moKeys = entries.filter(([_, m]) => m.startsWith('layer:'));
-    const modtapMappings = entries.filter(([_, m]) => m.startsWith('modtap:'));
-    const keyMappings = entries.filter(([_, mapping]) => {
-      return typeof mapping === 'string' && !mapping.startsWith('layer:') && !mapping.startsWith('modtap:') && mapping !== 'transparent' && mapping !== 'none';
-    });
-    if (moKeys.length === 0 && modtapMappings.length === 0 && keyMappings.length === 0) continue;
+    const moKeys = entries.filter(([_,m]) => m.startsWith('layer:'));
+    const mtMaps = entries.filter(([_,m]) => m.startsWith('modtap:'));
+    const keyMaps = entries.filter(([_,m]) => typeof m === 'string' && !m.startsWith('layer:') && !m.startsWith('modtap:') && m !== 'transparent' && m !== 'none');
+    if (!moKeys.length && !mtMaps.length && !keyMaps.length) continue;
 
-    script += `; === Layer ${li}: ${layer.name} ===\n`;
-    script += `#If (CurrentLayer = ${li})\n`;
+    s += `; === Layer ${li}: ${layer.name} ===\n`;
+    s += isV2 ? `#HotIf CurrentLayer ${EQ} ${li}\n` : `#If (CurrentLayer ${EQ} ${li})\n`;
 
-    // MO keys
-    moKeys.forEach(([phys, mapping]) => {
-      const keyName = ahkName(phys);
-      const safePhys = phys.replace(/[^a-zA-Z0-9_]/g, '_');
-      const targetLayer = parseInt(mapping.split(':')[1]);
-      script += `  $*${keyName}::\n`;
-      script += `    global _busy_${safePhys}\n`;
-      script += `    if (_busy_${safePhys})\n`;
-      script += `      return\n`;
-      script += `    _busy_${safePhys} := true\n`;
-      script += `    _MO_count++\n`;
-      script += `    if (_MO_count = 1)\n`;
-      script += `      _MO_base := CurrentLayer\n`;
-      script += `    CurrentLayer := ${targetLayer}\n`;
-      script += `    _MT_anykey := 1\n`;
-      script += `    KeyWait, ${keyName}\n`;
-      script += `    _MO_count--\n`;
-      script += `    if (_MO_count = 0)\n`;
-      script += `      CurrentLayer := _MO_base\n`;
-      script += `  return\n`;
+    moKeys.forEach(([phys,mapping]) => {
+      const kn = ahkName(phys), sp = phys.replace(/[^a-zA-Z0-9_]/g,'_'), tl = parseInt(mapping.split(':')[1]);
+      s += `  ${HO(kn,0)}`;
+      s += `    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
+      s += `    _MO_count++\n    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n`;
+      s += `    CurrentLayer := ${tl}\n    _MT_anykey := 1\n`;
+      s += KW(kn);
+      s += `    _MO_count--\n    if (_MO_count ${EQ} 0)\n      CurrentLayer := _MO_base\n`;
+      s += HC;
     });
 
-    // ModTap mappings
-    modtapMappings.forEach(([phys, mapping]) => {
+    mtMaps.forEach(([phys,mapping]) => {
       const parts = mapping.split(':');
-      const physName = ahkName(phys);
-      const tapName = ahkName(parts[1]);
-      const tapSend = `{${tapName}}`;
-      const safePhys = phys.replace(/[^a-zA-Z0-9_]/g, '_');
-      script += `  ; ModTap: ${physName} -> tap=${tapName}`;
+      const pn = ahkName(phys), tn = ahkName(parts[1]), ts = `{${tn}}`, sp = phys.replace(/[^a-zA-Z0-9_]/g,'_');
+      s += `  ; ModTap: ${pn} -> tap=${tn}`;
       if (parts[2] === 'layer') {
-        script += `, hold=MO(${parts[3]})\n`;
-        script += `  $*${physName}::\n`;
-        script += `    global _busy_${safePhys}\n`;
-        script += `    if (_busy_${safePhys})\n`;
-        script += `      return\n`;
-        script += `    _busy_${safePhys} := true\n`;
-        script += `    _MT_${safePhys}_held := false\n`;
-        script += `    _MT_anykey := 0\n`;
-        script += `    _MO_count++\n`;
-        script += `    if (_MO_count = 1)\n`;
-        script += `      _MO_base := CurrentLayer\n`;
-        script += `    CurrentLayer := ${parts[3]}\n`;
-        script += `    SetTimer, _MT_${safePhys}_chk, -300\n`;
-        script += `    KeyWait, ${physName}\n`;
-        script += `    SetTimer, _MT_${safePhys}_chk, Off\n`;
-        script += `    _MO_count--\n`;
-        script += `    if (_MO_count = 0)\n`;
-        script += `      CurrentLayer := _MO_base\n`;
-        script += `    if (!_MT_${safePhys}_held && !_MT_anykey) {\n`;
-        script += `      SendInput {Blind}${tapSend}\n`;
-        script += `    }\n`;
-        script += `  return\n`;
-        script += `  _MT_${safePhys}_chk:\n`;
-        script += `    _MT_${safePhys}_held := true\n`;
-        script += `  return\n`;
+        s += `, hold=MO(${parts[3]})\n  ${HO(pn,0)}`;
+        s += `    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
+        s += `    _MT_${sp}_held := false\n    _MT_anykey := 0\n    _MO_count++\n`;
+        s += `    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n`;
+        s += `    CurrentLayer := ${parts[3]}\n`;
+        s += ST(`_MT_${sp}_chk`, -300);
+        s += KW(pn);
+        s += SO(`_MT_${sp}_chk`);
+        s += `    _MO_count--\n    if (_MO_count ${EQ} 0)\n      CurrentLayer := _MO_base\n`;
+        s += `    if (!_MT_${sp}_held && !_MT_anykey) {\n`;
+        s += isV2 ? `      SendInput("{Blind}${ts}")\n` : `      SendInput {Blind}${ts}\n`;
+        s += `    }\n`;
+        s += HC;
+        s += `  ${FN(`_MT_${sp}_chk`)}    _MT_${sp}_held := true\n`;
+        s += isV2 ? '  }\n' : '  return\n';
       } else {
-        const holdName = ahkName(parts[2]);
-        script += `, hold=${holdName}\n`;
-        script += `  $*${physName}::\n`;
-        script += `    global _busy_${safePhys}\n`;
-        script += `    if (_busy_${safePhys})\n`;
-        script += `      return\n`;
-        script += `    _busy_${safePhys} := true\n`;
-        script += `    _MT_anykey := 1\n`;
-        script += `    KeyWait, ${physName}, T0.2\n`;
-        script += `    if (ErrorLevel) {\n`;
-        script += `      Send {Blind}{${holdName} DownR}\n`;
-        script += `      KeyWait, ${physName}\n`;
-        script += `      Send {Blind}{${holdName} Up}\n`;
-        script += `    } else {\n`;
-        script += `      SendInput {Blind}${tapSend}\n`;
-        script += `    }\n`;
-        script += `  return\n`;
+        const hn = ahkName(parts[2]);
+        s += `, hold=${hn}\n  ${HO(pn,0)}`;
+        s += `    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
+        s += `    _MT_anykey := 1\n`;
+        s += KWT(pn, '0.2');
+        s += `    if (ErrorLevel) {\n`;
+        s += SDW(hn); s += KW(pn); s += SUP(hn);
+        s += `    } else {\n`;
+        s += isV2 ? `      SendInput("{Blind}${ts}")\n` : `      SendInput {Blind}${ts}\n`;
+        s += `    }\n`;
+        s += HC;
       }
     });
 
-    // Regular mappings
-    if (keyMappings.length > 0) {
+    if (keyMaps.length > 0) {
       const modSet = new Set(['LCtrl','LShift','LAlt','LWin','RCtrl','RShift','RAlt','RWin']);
-      keyMappings.forEach(([phys, mapping]) => {
-        const physName = ahkName(phys);
-        const mapName = ahkName(mapping);
-        if (physName !== mapName) {
-          if (modSet.has(mapName)) {
-            script += `  $*${physName}::\n`;
-            script += `    _MT_anykey := 1\n`;
-            script += `    Send {Blind}{${mapName} DownR}\n`;
-            script += `  return\n`;
-            script += `  $*${physName} up::\n`;
-            script += `    Send {Blind}{${mapName} Up}\n`;
-            script += `  return\n`;
+      keyMaps.forEach(([phys,mapping]) => {
+        const pn = ahkName(phys), mn = ahkName(mapping);
+        if (pn !== mn) {
+          if (modSet.has(mn)) {
+            s += `  ${HO(pn,0)}    _MT_anykey := 1\n${SDW(mn)}${HC}`;
+            s += `  ${HO(pn,1)}${SUP(mn)}${HC}`;
           } else {
-            script += `  $*${physName}::\n`;
-            script += `    _MT_anykey := 1\n`;
-            script += `    SendInput {Blind}{${mapName}}\n`;
-            script += `  return\n`;
+            s += `  ${HO(pn,0)}    _MT_anykey := 1\n${SND(mn)}${HC}`;
           }
         }
       });
     }
 
-    script += `#If\n\n`;
+    s += isV2 ? `#HotIf\n\n` : `#If\n\n`;
   }
 
-  // === $key up:: ガードクリア ===
+  // ガードクリア
   if (guardKeys.size > 0) {
-    script += `; === ガードクリア（キーUP時） ===\n`;
+    s += `; === ガードクリア（キーUP時） ===\n`;
     guardKeys.forEach(phys => {
-      const keyName = ahkName(phys);
-      const safe = phys.replace(/[^a-zA-Z0-9_]/g, '_');
-      script += `$${keyName} up::\n`;
-      script += `  _busy_${safe} := false\n`;
-      script += `return\n`;
+      const kn = ahkName(phys), sf = phys.replace(/[^a-zA-Z0-9_]/g,'_');
+      s += `  ${HO(kn,1)}    _busy_${sf} := false\n${HC}`;
     });
-    script += `\n`;
+    s += `\n`;
   }
 
-  script += `\n; === 以上 自動生成 ===\n`;
-
-  // 確認ダイアログを表示
-  const overlay = document.getElementById('ahk-overlay');
-  const textarea = document.getElementById('ahk-text');
-  textarea.value = script;
-  textarea.scrollTop = 0;
-
-  const saveBtn = document.getElementById('ahk-save-btn');
-
-  const cleanup = () => {
-    overlay.classList.add('hidden');
-  };
-
-  // BOM付きUTF-8（AHK v1文字化け対策）
-  const prepareBlob = () => {
-    const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
-    const enc = new TextEncoder().encode(script);
-    const combined = new Uint8Array(bom.length + enc.length);
-    combined.set(bom); combined.set(enc, bom.length);
-    return new Blob([combined], { type:'text/plain;charset=utf-8' });
-  };
-
-  const downloadBlob = (blob, name) => {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = name;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  saveBtn.onclick = () => {
-    const blob = prepareBlob();
-    downloadBlob(blob, 'keyremapper.ahk');
-    cleanup();
-  };
-
-  document.getElementById('ahk-close-btn').onclick = cleanup;
-  document.getElementById('ahk-cancel-btn').onclick = cleanup;
-
-  overlay.classList.remove('hidden');
+  s += `\n; === 以上 自動生成 ===\n`;
+  return s;
 }
 
 // ---- 初期化 ----
