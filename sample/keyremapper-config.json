@@ -6,7 +6,8 @@
       "name": "Default",
       "mappings": {
         "space": "modtap:space:layer:1",
-        "f": "modtap:f:layer:2"
+        "f": "modtap:f:layer:2",
+        "semicolon": "modtap:semicolon:layer:2"
       }
     },
     {
@@ -37,7 +38,7 @@
         "t": "5",
         "n": "muhenkan",
         "m": "henkan",
-        "slash": "backslash",
+        "slash": "ro",
         "a": "6",
         "s": "7",
         "d": "8",

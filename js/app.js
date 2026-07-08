@@ -999,13 +999,6 @@ function generateAHK() {
       const targetLayer = parseInt(mapping.split(':')[1]);
       script += `  $*${keyName}::\n`;
       script += `    global _busy_${safePhys}\n`;
-      if (li === 0) {
-        script += `    if GetKeyState("Shift") or GetKeyState("Ctrl") or GetKeyState("Alt") or GetKeyState("LWin") or GetKeyState("RWin")\n`;
-        script += `    {\n`;
-        script += `      Send {Blind}{${keyName}}\n`;
-        script += `      return\n`;
-        script += `    }\n`;
-      }
       script += `    if (_busy_${safePhys})\n`;
       script += `      return\n`;
       script += `    _busy_${safePhys} := true\n`;
@@ -1033,13 +1026,6 @@ function generateAHK() {
         script += `, hold=MO(${parts[3]})\n`;
         script += `  $*${physName}::\n`;
         script += `    global _busy_${safePhys}\n`;
-        if (li === 0) {
-          script += `    if GetKeyState("Shift") or GetKeyState("Ctrl") or GetKeyState("Alt") or GetKeyState("LWin") or GetKeyState("RWin")\n`;
-          script += `    {\n`;
-          script += `      Send {Blind}{${physName}}\n`;
-          script += `      return\n`;
-          script += `    }\n`;
-        }
         script += `    if (_busy_${safePhys})\n`;
         script += `      return\n`;
         script += `    _busy_${safePhys} := true\n`;
@@ -1067,13 +1053,6 @@ function generateAHK() {
         script += `, hold=${holdName}\n`;
         script += `  $*${physName}::\n`;
         script += `    global _busy_${safePhys}\n`;
-        if (li === 0) {
-          script += `    if GetKeyState("Shift") or GetKeyState("Ctrl") or GetKeyState("Alt") or GetKeyState("LWin") or GetKeyState("RWin")\n`;
-          script += `    {\n`;
-          script += `      Send {Blind}{${physName}}\n`;
-          script += `      return\n`;
-          script += `    }\n`;
-        }
         script += `    if (_busy_${safePhys})\n`;
         script += `      return\n`;
         script += `    _busy_${safePhys} := true\n`;

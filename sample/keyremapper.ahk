@@ -1,6 +1,6 @@
 ﻿; ============================================================
 ; KeyRemapper - 生成された AutoHotkey スクリプト
-; 生成日時: 2026/7/6 17:53:00
+; 生成日時: 2026/7/7 14:02:07
 ; キーボード: JIS 109（フル）
 ; ============================================================
 
@@ -19,6 +19,7 @@ global _MO_count := 0
 ; === ガード変数 ===
 _busy_space := false
 _busy_f := false
+_busy_semicolon := false
 
 ; === レイヤー定義 ===
 ; Layer 0: Default
@@ -86,6 +87,36 @@ _busy_f := false
   return
   _MT_f_chk:
     _MT_f_held := true
+  return
+  ; ModTap: sc027 -> tap=sc027, hold=MO(2)
+  $*sc027::
+    global _busy_semicolon
+    if GetKeyState("Shift") or GetKeyState("Ctrl") or GetKeyState("Alt") or GetKeyState("LWin") or GetKeyState("RWin")
+    {
+      Send {Blind}{sc027}
+      return
+    }
+    if (_busy_semicolon)
+      return
+    _busy_semicolon := true
+    _MT_semicolon_held := false
+    _MT_anykey := 0
+    _MO_count++
+    if (_MO_count = 1)
+      _MO_base := CurrentLayer
+    CurrentLayer := 2
+    SetTimer, _MT_semicolon_chk, -300
+    KeyWait, sc027
+    SetTimer, _MT_semicolon_chk, Off
+    _MO_count--
+    if (_MO_count = 0)
+      CurrentLayer := _MO_base
+    if (!_MT_semicolon_held && !_MT_anykey) {
+      SendInput {Blind}{sc027}
+    }
+  return
+  _MT_semicolon_chk:
+    _MT_semicolon_held := true
   return
 #If
 
@@ -193,7 +224,7 @@ _busy_f := false
   return
   $*/::
     _MT_anykey := 1
-    SendInput {Blind}{\}
+    SendInput {Blind}{SC073}
   return
   $*a::
     _MT_anykey := 1
@@ -323,6 +354,9 @@ $Space up::
 return
 $f up::
   _busy_f := false
+return
+$sc027 up::
+  _busy_semicolon := false
 return
 
 
