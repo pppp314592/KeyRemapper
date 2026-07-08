@@ -936,8 +936,8 @@ function switchAhkTab(ver) {
 }
 
 function generateAHK(version) {
-  _ahkV1 = buildScript(1);
-  _ahkV2 = buildScript(2);
+  _ahkV1 = buildScript(false);
+  _ahkV2 = buildScript(true);
 
   const overlay = document.getElementById('ahk-overlay');
   const textarea = document.getElementById('ahk-text');
