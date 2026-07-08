@@ -27,6 +27,13 @@
       <button class="btn btn-primary" onclick="exportJSON()">💾 JSON保存</button>
       <button class="btn btn-accent" onclick="generateAHK(1)">⚡ AHK生成</button>
       <a class="btn btn-link" href="https://www.autohotkey.com/" target="_blank" title="AutoHotkey v2 ダウンロード">🔗 AHK入手</a>
+      <select id="theme-select" class="theme-select" onchange="setTheme(this.value)">
+        <option value="dark">Dark</option>
+        <option value="midnight">Midnight</option>
+        <option value="forest">Forest</option>
+        <option value="dracula">Dracula</option>
+        <option value="light">Light</option>
+      </select>
     </div>
   </header>
 

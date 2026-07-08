@@ -1,6 +1,6 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 
-:root {
+:root, [data-theme="dark"] {
   --bg: #1a1a2e;
   --bg2: #16213e;
   --bg3: #0f3460;
@@ -16,6 +16,70 @@
   --layer-active: #0f3460;
   --modal-bg: #1e1e3a;
   --radius: 8px;
+}
+[data-theme="midnight"] {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #21262d;
+  --accent: #f78166;
+  --accent2: #58a6ff;
+  --text: #f0f6fc;
+  --text-dim: #8b949e;
+  --key-bg: #21262d;
+  --key-border: #30363d;
+  --key-hover: #30363d;
+  --key-mapped: #58a6ff33;
+  --layer-bg: #161b22;
+  --layer-active: #21262d;
+  --modal-bg: #161b22;
+}
+[data-theme="forest"] {
+  --bg: #1b2d1b;
+  --bg2: #243524;
+  --bg3: #2d4a2d;
+  --accent: #e6c384;
+  --accent2: #a3d977;
+  --text: #e0e0d0;
+  --text-dim: #8a9a7a;
+  --key-bg: #2a4030;
+  --key-border: #3a5a40;
+  --key-hover: #3a5a40;
+  --key-mapped: #a3d97733;
+  --layer-bg: #243524;
+  --layer-active: #2d4a2d;
+  --modal-bg: #1b2d1b;
+}
+[data-theme="dracula"] {
+  --bg: #282a36;
+  --bg2: #44475a;
+  --bg3: #6272a4;
+  --accent: #ff5555;
+  --accent2: #bd93f9;
+  --text: #f8f8f2;
+  --text-dim: #8888aa;
+  --key-bg: #3a3c52;
+  --key-border: #4a4c6a;
+  --key-hover: #4a4c6a;
+  --key-mapped: #bd93f933;
+  --layer-bg: #44475a;
+  --layer-active: #6272a4;
+  --modal-bg: #282a36;
+}
+[data-theme="light"] {
+  --bg: #f8f9fa;
+  --bg2: #e9ecef;
+  --bg3: #dee2e6;
+  --accent: #e94560;
+  --accent2: #4361ee;
+  --text: #1a1a2e;
+  --text-dim: #6c757d;
+  --key-bg: #ffffff;
+  --key-border: #ced4da;
+  --key-hover: #e9ecef;
+  --key-mapped: #4361ee22;
+  --layer-bg: #e9ecef;
+  --layer-active: #dee2e6;
+  --modal-bg: #ffffff;
 }
 
 body {
@@ -68,6 +132,9 @@ body {
 .btn-small { padding:4px 10px; font-size:13px; }
 .btn-close { background:none; border:none; color:var(--text-dim); font-size:20px; cursor:pointer; padding:4px; line-height:1; }
 .btn-close:hover { color:var(--text); }
+.btn-link { background:none; border:1px solid var(--text-dim); color:var(--text-dim); padding:8px 14px; border-radius:var(--radius); cursor:pointer; text-decoration:none; font-size:13px; display:inline-flex; align-items:center; }
+.btn-link:hover { border-color:var(--text); color:var(--text); }
+.theme-select { background:var(--bg3); color:var(--text); border:1px solid #ffffff20; padding:8px 10px; border-radius:var(--radius); font-size:12px; cursor:pointer; outline:none; }
 
 /* Main */
 #main {

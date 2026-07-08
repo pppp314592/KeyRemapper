@@ -1117,8 +1117,19 @@ function buildScript(isV2) {
   return s;
 }
 
+// ---- テーマ切替 ----
+function setTheme(name) {
+  document.documentElement.dataset.theme = name;
+  localStorage.setItem('keyremapper-theme', name);
+}
+
 // ---- 初期化 ----
 document.addEventListener('DOMContentLoaded', () => {
+  // テーマ復元
+  const saved = localStorage.getItem('keyremapper-theme') || 'dark';
+  document.getElementById('theme-select').value = saved;
+  setTheme(saved);
+
   document.getElementById('kb-layout-select').addEventListener('change', (e) => {
     state.layout = e.target.value;
     renderKeyboard();
