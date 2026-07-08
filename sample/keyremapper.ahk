@@ -1,14 +1,13 @@
 ﻿; ============================================================
-; KeyRemapper - 生成された AutoHotkey スクリプト
-; 生成日時: 2026/7/8 11:51:33
-; キーボード: JIS 109（フル）
+; KeyRemapper - AutoHotkey v1
+; 2026/7/8 12:00:55 | JIS 109（フル）
 ; ============================================================
 
 #SingleInstance Force
 #Persistent
 #NoEnv
-#Warn
 #MaxThreadsPerHotkey, 20
+#Warn
 
 ; === レイヤー状態 ===
 global CurrentLayer := 0
@@ -29,7 +28,7 @@ _busy_semicolon := false
 ; === Layer 0: Default ===
 #If (CurrentLayer = 0)
   ; ModTap: Space -> tap=Space, hold=MO(1)
-  $*Space::
+  $Space::
     global _busy_space
     if (_busy_space)
       return
@@ -40,9 +39,9 @@ _busy_semicolon := false
     if (_MO_count = 1)
       _MO_base := CurrentLayer
     CurrentLayer := 1
-    SetTimer, _MT_space_chk, -300
-    KeyWait, Space
-    SetTimer, _MT_space_chk, Off
+  SetTimer, _MT_space_chk, -300
+  KeyWait, Space
+  SetTimer, _MT_space_chk, Off
     _MO_count--
     if (_MO_count = 0)
       CurrentLayer := _MO_base
@@ -54,7 +53,7 @@ _busy_semicolon := false
     _MT_space_held := true
   return
   ; ModTap: f -> tap=f, hold=MO(2)
-  $*f::
+  $f::
     global _busy_f
     if (_busy_f)
       return
@@ -65,9 +64,9 @@ _busy_semicolon := false
     if (_MO_count = 1)
       _MO_base := CurrentLayer
     CurrentLayer := 2
-    SetTimer, _MT_f_chk, -300
-    KeyWait, f
-    SetTimer, _MT_f_chk, Off
+  SetTimer, _MT_f_chk, -300
+  KeyWait, f
+  SetTimer, _MT_f_chk, Off
     _MO_count--
     if (_MO_count = 0)
       CurrentLayer := _MO_base
@@ -79,7 +78,7 @@ _busy_semicolon := false
     _MT_f_held := true
   return
   ; ModTap: sc027 -> tap=sc027, hold=MO(2)
-  $*sc027::
+  $sc027::
     global _busy_semicolon
     if (_busy_semicolon)
       return
@@ -90,9 +89,9 @@ _busy_semicolon := false
     if (_MO_count = 1)
       _MO_base := CurrentLayer
     CurrentLayer := 2
-    SetTimer, _MT_semicolon_chk, -300
-    KeyWait, sc027
-    SetTimer, _MT_semicolon_chk, Off
+  SetTimer, _MT_semicolon_chk, -300
+  KeyWait, sc027
+  SetTimer, _MT_semicolon_chk, Off
     _MO_count--
     if (_MO_count = 0)
       CurrentLayer := _MO_base
@@ -107,242 +106,242 @@ _busy_semicolon := false
 
 ; === Layer 1: Layer 1 ===
 #If (CurrentLayer = 1)
-  $*0::
+  $0::
     _MT_anykey := 1
-    SendInput {Blind}{F10}
+  SendInput {Blind}{F10}
   return
-  $*1::
+  $1::
     _MT_anykey := 1
-    SendInput {Blind}{F1}
+  SendInput {Blind}{F1}
   return
-  $*2::
+  $2::
     _MT_anykey := 1
-    SendInput {Blind}{F2}
+  SendInput {Blind}{F2}
   return
-  $*3::
+  $3::
     _MT_anykey := 1
-    SendInput {Blind}{F3}
+  SendInput {Blind}{F3}
   return
-  $*4::
+  $4::
     _MT_anykey := 1
-    SendInput {Blind}{F4}
+  SendInput {Blind}{F4}
   return
-  $*5::
+  $5::
     _MT_anykey := 1
-    SendInput {Blind}{F5}
+  SendInput {Blind}{F5}
   return
-  $*6::
+  $6::
     _MT_anykey := 1
-    SendInput {Blind}{F6}
+  SendInput {Blind}{F6}
   return
-  $*7::
+  $7::
     _MT_anykey := 1
-    SendInput {Blind}{F7}
+  SendInput {Blind}{F7}
   return
-  $*8::
+  $8::
     _MT_anykey := 1
-    SendInput {Blind}{F8}
+  SendInput {Blind}{F8}
   return
-  $*9::
+  $9::
     _MT_anykey := 1
-    SendInput {Blind}{F9}
+  SendInput {Blind}{F9}
   return
-  $*i::
+  $i::
     _MT_anykey := 1
-    SendInput {Blind}{Up}
+  SendInput {Blind}{Up}
   return
-  $*j::
+  $j::
     _MT_anykey := 1
-    SendInput {Blind}{Left}
+  SendInput {Blind}{Left}
   return
-  $*k::
+  $k::
     _MT_anykey := 1
-    SendInput {Blind}{Down}
+  SendInput {Blind}{Down}
   return
-  $*l::
+  $l::
     _MT_anykey := 1
-    SendInput {Blind}{Right}
+  SendInput {Blind}{Right}
   return
-  $*p::
+  $p::
     _MT_anykey := 1
-    SendInput {Blind}{Backspace}
+  SendInput {Blind}{Backspace}
   return
-  $*'::
+  $'::
     _MT_anykey := 1
-    SendInput {Blind}{]}
+  SendInput {Blind}{]}
   return
-  $*u::
+  $u::
     _MT_anykey := 1
-    SendInput {Blind}{Home}
+  SendInput {Blind}{Home}
   return
-  $*o::
+  $o::
     _MT_anykey := 1
-    SendInput {Blind}{End}
+  SendInput {Blind}{End}
   return
-  $*q::
+  $q::
     _MT_anykey := 1
-    SendInput {Blind}{1}
+  SendInput {Blind}{1}
   return
-  $*w::
+  $w::
     _MT_anykey := 1
-    SendInput {Blind}{2}
+  SendInput {Blind}{2}
   return
-  $*e::
+  $e::
     _MT_anykey := 1
-    SendInput {Blind}{3}
+  SendInput {Blind}{3}
   return
-  $*r::
+  $r::
     _MT_anykey := 1
-    SendInput {Blind}{4}
+  SendInput {Blind}{4}
   return
-  $*t::
+  $t::
     _MT_anykey := 1
-    SendInput {Blind}{5}
+  SendInput {Blind}{5}
   return
-  $*n::
+  $n::
     _MT_anykey := 1
-    SendInput {Blind}{SC07B}
+  SendInput {Blind}{SC07B}
   return
-  $*m::
+  $m::
     _MT_anykey := 1
-    SendInput {Blind}{SC079}
+  SendInput {Blind}{SC079}
   return
-  $*/::
+  $/::
     _MT_anykey := 1
-    SendInput {Blind}{SC073}
+  SendInput {Blind}{SC073}
   return
-  $*a::
+  $a::
     _MT_anykey := 1
-    SendInput {Blind}{6}
+  SendInput {Blind}{6}
   return
-  $*s::
+  $s::
     _MT_anykey := 1
-    SendInput {Blind}{7}
+  SendInput {Blind}{7}
   return
-  $*d::
+  $d::
     _MT_anykey := 1
-    SendInput {Blind}{8}
+  SendInput {Blind}{8}
   return
-  $*f::
+  $f::
     _MT_anykey := 1
-    SendInput {Blind}{9}
+  SendInput {Blind}{9}
   return
-  $*g::
+  $g::
     _MT_anykey := 1
-    SendInput {Blind}{0}
+  SendInput {Blind}{0}
   return
-  $*sc00d::
+  $sc00d::
     _MT_anykey := 1
-    SendInput {Blind}{F12}
+  SendInput {Blind}{F12}
   return
-  $*-::
+  $-::
     _MT_anykey := 1
-    SendInput {Blind}{F11}
+  SendInput {Blind}{F11}
   return
-  $*h::
+  $h::
     _MT_anykey := 1
-    SendInput {Blind}{Delete}
+  SendInput {Blind}{Delete}
   return
-  $*SC01A::
+  $SC01A::
     _MT_anykey := 1
-    SendInput {Blind}{[}
+  SendInput {Blind}{[}
   return
-  $*[::
+  $[::
     _MT_anykey := 1
-    SendInput {Blind}{Volume_Up}
+  SendInput {Blind}{Volume_Up}
   return
-  $*]::
+  $]::
     _MT_anykey := 1
-    SendInput {Blind}{Volume_Down}
+  SendInput {Blind}{Volume_Down}
   return
-  $*z::
+  $z::
     _MT_anykey := 1
-    SendInput {Blind}{-}
+  SendInput {Blind}{-}
   return
-  $*x::
+  $x::
     _MT_anykey := 1
-    SendInput {Blind}{sc00d}
+  SendInput {Blind}{sc00d}
   return
-  $*c::
+  $c::
     _MT_anykey := 1
-    SendInput {Blind}{\}
+  SendInput {Blind}{\}
   return
-  $*sc027::
+  $sc027::
     _MT_anykey := 1
-    SendInput {Blind}{Enter}
+  SendInput {Blind}{Enter}
   return
-  $*,::
+  $,::
     _MT_anykey := 1
-    SendInput {Blind}{<}
+  SendInput {Blind}{<}
   return
-  $*.::
+  $.::
     _MT_anykey := 1
-    SendInput {Blind}{>}
+  SendInput {Blind}{>}
   return
 #If
 
 ; === Layer 2: Layer 2 ===
 #If (CurrentLayer = 2)
-  $*Space::
+  $Space::
     _MT_anykey := 1
-    SendInput {Blind}{Numpad0}
+  SendInput {Blind}{Numpad0}
   return
-  $*j::
+  $j::
     _MT_anykey := 1
-    SendInput {Blind}{Numpad4}
+  SendInput {Blind}{Numpad4}
   return
-  $*m::
+  $m::
     _MT_anykey := 1
-    SendInput {Blind}{Numpad1}
+  SendInput {Blind}{Numpad1}
   return
-  $*,::
+  $,::
     _MT_anykey := 1
-    SendInput {Blind}{Numpad2}
+  SendInput {Blind}{Numpad2}
   return
-  $*.::
+  $.::
     _MT_anykey := 1
-    SendInput {Blind}{Numpad3}
+  SendInput {Blind}{Numpad3}
   return
-  $*k::
+  $k::
     _MT_anykey := 1
-    SendInput {Blind}{Numpad5}
+  SendInput {Blind}{Numpad5}
   return
-  $*l::
+  $l::
     _MT_anykey := 1
-    SendInput {Blind}{Numpad6}
+  SendInput {Blind}{Numpad6}
   return
-  $*u::
+  $u::
     _MT_anykey := 1
-    SendInput {Blind}{Numpad7}
+  SendInput {Blind}{Numpad7}
   return
-  $*i::
+  $i::
     _MT_anykey := 1
-    SendInput {Blind}{Numpad8}
+  SendInput {Blind}{Numpad8}
   return
-  $*o::
+  $o::
     _MT_anykey := 1
-    SendInput {Blind}{Numpad9}
+  SendInput {Blind}{Numpad9}
   return
-  $*p::
+  $p::
     _MT_anykey := 1
-    SendInput {Blind}{Backspace}
+  SendInput {Blind}{Backspace}
   return
-  $*sc027::
+  $sc027::
     _MT_anykey := 1
-    SendInput {Blind}{NumpadEnter}
+  SendInput {Blind}{NumpadEnter}
   return
 #If
 
 ; === ガードクリア（キーUP時） ===
-$Space up::
-  _busy_space := false
-return
-$f up::
-  _busy_f := false
-return
-$sc027 up::
-  _busy_semicolon := false
-return
+  $Space up::
+    _busy_space := false
+  return
+  $f up::
+    _busy_f := false
+  return
+  $sc027 up::
+    _busy_semicolon := false
+  return
 
 
 ; === 以上 自動生成 ===

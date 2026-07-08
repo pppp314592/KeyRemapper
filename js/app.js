@@ -984,6 +984,9 @@ function buildScript(isV2) {
   const SO = (n) => isV2 ? `  SetTimer(${n},0)\n` : `  SetTimer, ${n}, Off\n`;
   const FN = (n) => isV2 ? `${n}() {\n` : `${n}:\n`;
 
+  // v2用 global 宣言ヘルパー
+  const G = (vars) => isV2 ? `    global ${vars}\n` : '';
+
   let s = '';
   s += `; ============================================================\n`;
   s += `; KeyRemapper - AutoHotkey ${isV2?'v2':'v1'}\n`;
@@ -1035,6 +1038,7 @@ function buildScript(isV2) {
     moKeys.forEach(([phys,mapping]) => {
       const kn = ahkName(phys), sp = phys.replace(/[^a-zA-Z0-9_]/g,'_'), tl = parseInt(mapping.split(':')[1]);
       s += `  ${HO(kn,0)}`;
+      s += G(`_busy_${sp}, _MT_anykey, _MO_count, _MO_base, CurrentLayer`);
       s += `    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
       s += `    _MO_count++\n    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n`;
       s += `    CurrentLayer := ${tl}\n    _MT_anykey := 1\n`;
@@ -1049,6 +1053,7 @@ function buildScript(isV2) {
       s += `  ; ModTap: ${pn} -> tap=${tn}`;
       if (parts[2] === 'layer') {
         s += `, hold=MO(${parts[3]})\n  ${HO(pn,0)}`;
+        s += G(`_busy_${sp}, _MT_${sp}_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer`);
         s += `    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
         s += `    _MT_${sp}_held := false\n    _MT_anykey := 0\n    _MO_count++\n`;
         s += `    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n`;
@@ -1061,11 +1066,13 @@ function buildScript(isV2) {
         s += isV2 ? `      SendInput("{Blind}${ts}")\n` : `      SendInput {Blind}${ts}\n`;
         s += `    }\n`;
         s += HC;
-        s += `  ${FN(`_MT_${sp}_chk`)}    _MT_${sp}_held := true\n`;
-        s += isV2 ? '  }\n' : '  return\n';
+        s += `  ${FN(`_MT_${sp}_chk`)}`;
+        s += isV2 ? `    global _MT_${sp}_held\n    _MT_${sp}_held := true\n  }\n`
+                  : `    _MT_${sp}_held := true\n  return\n`;
       } else {
         const hn = ahkName(parts[2]);
         s += `, hold=${hn}\n  ${HO(pn,0)}`;
+        s += G(`_busy_${sp}, _MT_anykey`);
         s += `    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
         s += `    _MT_anykey := 1\n`;
         s += KWT(pn, '0.2');
@@ -1084,10 +1091,10 @@ function buildScript(isV2) {
         const pn = ahkName(phys), mn = ahkName(mapping);
         if (pn !== mn) {
           if (modSet.has(mn)) {
-            s += `  ${HO(pn,0)}    _MT_anykey := 1\n${SDW(mn)}${HC}`;
+            s += `  ${HO(pn,0)}${G('_MT_anykey')}    _MT_anykey := 1\n${SDW(mn)}${HC}`;
             s += `  ${HO(pn,1)}${SUP(mn)}${HC}`;
           } else {
-            s += `  ${HO(pn,0)}    _MT_anykey := 1\n${SND(mn)}${HC}`;
+            s += `  ${HO(pn,0)}${G('_MT_anykey')}    _MT_anykey := 1\n${SND(mn)}${HC}`;
           }
         }
       });
@@ -1101,7 +1108,7 @@ function buildScript(isV2) {
     s += `; === ガードクリア（キーUP時） ===\n`;
     guardKeys.forEach(phys => {
       const kn = ahkName(phys), sf = phys.replace(/[^a-zA-Z0-9_]/g,'_');
-      s += `  ${HO(kn,1)}    _busy_${sf} := false\n${HC}`;
+      s += `  ${HO(kn,1)}${G(`_busy_${sf}`)}    _busy_${sf} := false\n${HC}`;
     });
     s += `\n`;
   }
