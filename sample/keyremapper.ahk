@@ -1,19 +1,16 @@
 ﻿; ============================================================
-; KeyRemapper - AutoHotkey v1
-; 2026/7/9 20:51:05 | JIS 109（フル）
+; KeyRemapper - AutoHotkey v2
+; 2026/7/9 21:12:42 | JIS 109（フル）
 ; ============================================================
 
 #SingleInstance Force
-#Persistent
-#NoEnv
-#MaxThreadsPerHotkey, 20
 #Warn
 
 ; === レイヤー状態 ===
-global CurrentLayer := 0
-global _MT_anykey := 0
-global _MO_base := 0
-global _MO_count := 0
+CurrentLayer := 0
+_MT_anykey := 0
+_MO_base := 0
+_MO_count := 0
 
 ; === ガード変数 ===
 _busy_space := false
@@ -26,9 +23,10 @@ _busy_semicolon := false
 ; Layer 2: Layer 2
 
 ; === Layer 0: Default ===
-#If (CurrentLayer = 0)
+#HotIf CurrentLayer == 0
   ; ModTap: Space -> tap=Space, hold=MO(1)
-  $*Space::
+  $*Space:: {
+    global _busy_space, _MT_space_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer
     global _busy_space
     if (_busy_space)
       return
@@ -36,24 +34,26 @@ _busy_semicolon := false
     _MT_space_held := false
     _MT_anykey := 0
     _MO_count++
-    if (_MO_count = 1)
+    if (_MO_count == 1)
       _MO_base := CurrentLayer
     CurrentLayer := 1
-  SetTimer, _MT_space_chk, -300
-  KeyWait, Space
-  SetTimer, _MT_space_chk, Off
+  SetTimer(_MT_space_chk,-300)
+  KeyWait("Space")
+  SetTimer(_MT_space_chk,0)
     _MO_count--
-    if (_MO_count = 0)
+    if (_MO_count == 0)
       CurrentLayer := _MO_base
     if (!_MT_space_held && !_MT_anykey) {
-      SendInput {Blind}{Space}
+      SendInput("{Blind}{Space}")
     }
-  return
-  _MT_space_chk:
+}
+  _MT_space_chk() {
+    global _MT_space_held
     _MT_space_held := true
-  return
+  }
   ; ModTap: f -> tap=f, hold=MO(2)
-  $*f::
+  $*f:: {
+    global _busy_f, _MT_f_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer
     global _busy_f
     if (_busy_f)
       return
@@ -61,24 +61,26 @@ _busy_semicolon := false
     _MT_f_held := false
     _MT_anykey := 0
     _MO_count++
-    if (_MO_count = 1)
+    if (_MO_count == 1)
       _MO_base := CurrentLayer
     CurrentLayer := 2
-  SetTimer, _MT_f_chk, -300
-  KeyWait, f
-  SetTimer, _MT_f_chk, Off
+  SetTimer(_MT_f_chk,-300)
+  KeyWait("f")
+  SetTimer(_MT_f_chk,0)
     _MO_count--
-    if (_MO_count = 0)
+    if (_MO_count == 0)
       CurrentLayer := _MO_base
     if (!_MT_f_held && !_MT_anykey) {
-      SendInput {Blind}{f}
+      SendInput("{Blind}{f}")
     }
-  return
-  _MT_f_chk:
+}
+  _MT_f_chk() {
+    global _MT_f_held
     _MT_f_held := true
-  return
+  }
   ; ModTap: sc027 -> tap=sc027, hold=MO(2)
-  $*sc027::
+  $*sc027:: {
+    global _busy_semicolon, _MT_semicolon_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer
     global _busy_semicolon
     if (_busy_semicolon)
       return
@@ -86,310 +88,381 @@ _busy_semicolon := false
     _MT_semicolon_held := false
     _MT_anykey := 0
     _MO_count++
-    if (_MO_count = 1)
+    if (_MO_count == 1)
       _MO_base := CurrentLayer
     CurrentLayer := 2
-  SetTimer, _MT_semicolon_chk, -300
-  KeyWait, sc027
-  SetTimer, _MT_semicolon_chk, Off
+  SetTimer(_MT_semicolon_chk,-300)
+  KeyWait("sc027")
+  SetTimer(_MT_semicolon_chk,0)
     _MO_count--
-    if (_MO_count = 0)
+    if (_MO_count == 0)
       CurrentLayer := _MO_base
     if (!_MT_semicolon_held && !_MT_anykey) {
-      SendInput {Blind}{sc027}
+      SendInput("{Blind}{sc027}")
     }
-  return
-  _MT_semicolon_chk:
+}
+  _MT_semicolon_chk() {
+    global _MT_semicolon_held
     _MT_semicolon_held := true
-  return
-#If
+  }
+#HotIf
 
 ; === Layer 1: Layer 1 ===
-#If (CurrentLayer = 1)
-  $*0::
+#HotIf CurrentLayer == 1
+  $*0:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F10}
-  return
-  $*1::
+  SendInput("{Blind}{F10}")
+}
+  $*1:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F1}
-  return
-  $*2::
+  SendInput("{Blind}{F1}")
+}
+  $*2:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F2}
-  return
-  $*3::
+  SendInput("{Blind}{F2}")
+}
+  $*3:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F3}
-  return
-  $*4::
+  SendInput("{Blind}{F3}")
+}
+  $*4:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F4}
-  return
-  $*5::
+  SendInput("{Blind}{F4}")
+}
+  $*5:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F5}
-  return
-  $*6::
+  SendInput("{Blind}{F5}")
+}
+  $*6:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F6}
-  return
-  $*7::
+  SendInput("{Blind}{F6}")
+}
+  $*7:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F7}
-  return
-  $*8::
+  SendInput("{Blind}{F7}")
+}
+  $*8:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F8}
-  return
-  $*9::
+  SendInput("{Blind}{F8}")
+}
+  $*9:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F9}
-  return
-  $*i::
+  SendInput("{Blind}{F9}")
+}
+  $*i:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{Up}
-  return
-  $*j::
+  SendInput("{Blind}{Up}")
+}
+  $*j:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{Left}
-  return
-  $*k::
+  SendInput("{Blind}{Left}")
+}
+  $*k:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{Down}
-  return
-  $*l::
+  SendInput("{Blind}{Down}")
+}
+  $*l:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{Right}
-  return
-  $*p::
+  SendInput("{Blind}{Right}")
+}
+  $*p:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{Backspace}
-  return
-  $*'::
+  SendInput("{Blind}{Backspace}")
+}
+  $*SC028:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}]
-  return
-  $*u::
+  SendInput("{Blind}]")
+}
+  $*u:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{Home}
-  return
-  $*o::
+  SendInput("{Blind}{Home}")
+}
+  $*o:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{End}
-  return
-  $*q::
+  SendInput("{Blind}{End}")
+}
+  $*q:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}1
-  return
-  $*w::
+  SendInput("{Blind}1")
+}
+  $*w:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}2
-  return
-  $*e::
+  SendInput("{Blind}2")
+}
+  $*e:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}3
-  return
-  $*r::
+  SendInput("{Blind}3")
+}
+  $*r:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}4
-  return
-  $*t::
+  SendInput("{Blind}4")
+}
+  $*t:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}5
-  return
-  $*n::
+  SendInput("{Blind}5")
+}
+  $*n:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{SC07B}
-  return
-  $*m::
+  SendInput("{Blind}{SC07B}")
+}
+  $*m:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{SC079}
-  return
-  $*/::
+  SendInput("{Blind}{SC079}")
+}
+  $*/:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{SC073}
-  return
-  $*a::
+  SendInput("{Blind}{SC073}")
+}
+  $*a:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}6
-  return
-  $*s::
+  SendInput("{Blind}6")
+}
+  $*s:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}7
-  return
-  $*d::
+  SendInput("{Blind}7")
+}
+  $*d:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}8
-  return
-  $*f::
+  SendInput("{Blind}8")
+}
+  $*f:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}9
-  return
-  $*g::
+  SendInput("{Blind}9")
+}
+  $*g:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}0
-  return
-  $*sc00d::
+  SendInput("{Blind}0")
+}
+  $*sc00d:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F12}
-  return
-  $*-::
+  SendInput("{Blind}{F12}")
+}
+  $*-:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F11}
-  return
-  $*h::
+  SendInput("{Blind}{F11}")
+}
+  $*h:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{Delete}
-  return
-  $*SC01A::
+  SendInput("{Blind}{Delete}")
+}
+  $*SC01A:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}[
-  return
-  $*[::
+  SendInput("{Blind}[")
+}
+  $*[:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{Volume_Down}
-  return
-  $*]::
+  SendInput("{Blind}{Volume_Down}")
+}
+  $*]:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{Volume_Up}
-  return
-  $*z::
+  SendInput("{Blind}{Volume_Up}")
+}
+  $*z:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}-
-  return
-  $*x::
+  SendInput("{Blind}-")
+}
+  $*x:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{sc00d}
-  return
-  $*c::
+  SendInput("{Blind}{sc00d}")
+}
+  $*c:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}\
-  return
-  $*sc027::
+  SendInput("{Blind}\")
+}
+  $*sc027:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{Enter}
-  return
-  $*,::
+  SendInput("{Blind}{Enter}")
+}
+  $*,:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}<
-  return
-  $*.::
+  SendInput("{Blind}<")
+}
+  $*.:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}>
-  return
-#If
+  SendInput("{Blind}>")
+}
+#HotIf
 
 ; === Layer 2: Layer 2 ===
-#If (CurrentLayer = 2)
-  $*Space::
+#HotIf CurrentLayer == 2
+  $*Space:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{Numpad0}
-  return
-  $*j::
+  SendInput("{Blind}{Numpad0}")
+}
+  $*j:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{Numpad4}
-  return
-  $*m::
+  SendInput("{Blind}{Numpad4}")
+}
+  $*m:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{Numpad1}
-  return
-  $*,::
+  SendInput("{Blind}{Numpad1}")
+}
+  $*,:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{Numpad2}
-  return
-  $*.::
+  SendInput("{Blind}{Numpad2}")
+}
+  $*.:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{Numpad3}
-  return
-  $*k::
+  SendInput("{Blind}{Numpad3}")
+}
+  $*k:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{Numpad5}
-  return
-  $*l::
+  SendInput("{Blind}{Numpad5}")
+}
+  $*l:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{Numpad6}
-  return
-  $*q::
+  SendInput("{Blind}{Numpad6}")
+}
+  $*q:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F1}
-  return
-  $*w::
+  SendInput("{Blind}{F1}")
+}
+  $*w:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F2}
-  return
-  $*e::
+  SendInput("{Blind}{F2}")
+}
+  $*e:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F3}
-  return
-  $*r::
+  SendInput("{Blind}{F3}")
+}
+  $*r:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F4}
-  return
-  $*t::
+  SendInput("{Blind}{F4}")
+}
+  $*t:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F5}
-  return
-  $*u::
+  SendInput("{Blind}{F5}")
+}
+  $*u:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{Numpad7}
-  return
-  $*i::
+  SendInput("{Blind}{Numpad7}")
+}
+  $*i:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{Numpad8}
-  return
-  $*o::
+  SendInput("{Blind}{Numpad8}")
+}
+  $*o:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{Numpad9}
-  return
-  $*p::
+  SendInput("{Blind}{Numpad9}")
+}
+  $*p:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{Backspace}
-  return
-  $*a::
+  SendInput("{Blind}{Backspace}")
+}
+  $*a:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F6}
-  return
-  $*s::
+  SendInput("{Blind}{F6}")
+}
+  $*s:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F7}
-  return
-  $*d::
+  SendInput("{Blind}{F7}")
+}
+  $*d:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F8}
-  return
-  $*f::
+  SendInput("{Blind}{F8}")
+}
+  $*f:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F9}
-  return
-  $*g::
+  SendInput("{Blind}{F9}")
+}
+  $*g:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F10}
-  return
-  $*z::
+  SendInput("{Blind}{F10}")
+}
+  $*z:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F11}
-  return
-  $*x::
+  SendInput("{Blind}{F11}")
+}
+  $*x:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{F12}
-  return
-  $*sc027::
+  SendInput("{Blind}{F12}")
+}
+  $*sc027:: {
+    global _MT_anykey
     _MT_anykey := 1
-  SendInput {Blind}{NumpadEnter}
-  return
-#If
+  SendInput("{Blind}{NumpadEnter}")
+}
+#HotIf
 
 ; === ガードクリア（キーUP時） ===
-  $*Space up::
+  $*Space up:: {
+    global _busy_space
     _busy_space := false
-  return
-  $*f up::
+}
+  $*f up:: {
+    global _busy_f
     _busy_f := false
-  return
-  $*sc027 up::
+}
+  $*sc027 up:: {
+    global _busy_semicolon
     _busy_semicolon := false
-  return
+}
 
 
 ; === 以上 自動生成 ===

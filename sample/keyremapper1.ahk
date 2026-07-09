@@ -1,6 +1,6 @@
 ﻿; ============================================================
 ; KeyRemapper - AutoHotkey v1
-; 2026/7/9 20:48:55 | JIS 109（フル）
+; 2026/7/9 21:12:03 | JIS 109（フル）
 ; ============================================================
 
 #SingleInstance Force
@@ -166,7 +166,7 @@ _busy_semicolon := false
     _MT_anykey := 1
   SendInput {Blind}{Backspace}
   return
-  $*'::
+  $*SC028::
     _MT_anykey := 1
   SendInput {Blind}]
   return
