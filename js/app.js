@@ -977,7 +977,12 @@ function buildScript(isV2) {
   const HC = isV2 ? '}\n' : '  return\n';
   const KW = (k) => isV2 ? `  KeyWait("${k}")\n` : `  KeyWait, ${k}\n`;
   const KWT = (k,t) => isV2 ? `  KeyWait("${k}","T${t}")\n` : `  KeyWait, ${k}, T${t}\n`;
-  const SND = (k) => isV2 ? `  SendInput("{Blind}{${k}}")\n` : `  SendInput {Blind}{${k}}\n`;
+  const SND = (k) => {
+    const v = isV2 ? k.replace(/"/g, '""') : k;
+    const needBrace = /^[!^+#{}"]$/.test(k) || k.length > 1;
+    const body = needBrace ? `{${v}}` : v;
+    return isV2 ? `  SendInput("{Blind}${body}")\n` : `  SendInput {Blind}${body}\n`;
+  };
   const SDW = (m) => isV2 ? `  Send("{Blind}{${m} DownR}")\n` : `  Send {Blind}{${m} DownR}\n`;
   const SUP = (m) => isV2 ? `  Send("{Blind}{${m} Up}")\n` : `  Send {Blind}{${m} Up}\n`;
   const ST = (n,ms) => isV2 ? `  SetTimer(${n},${ms})\n` : `  SetTimer, ${n}, ${ms}\n`;
