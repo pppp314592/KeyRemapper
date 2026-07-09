@@ -58,7 +58,7 @@ const KEY_DEFS = [
   { id:'caret', label:'^~', category:'JIS', ahk:'sc00d' },
   { id:'at_mark', label:'@', category:'JIS', ahk:'SC01A' },
   { id:'lbracket_jis', label:'[{', category:'JIS', ahk:'[' },
-  { id:'colon_jis', label:':*', labelJis:':*', category:'JIS', ahk:"'" },
+  { id:'colon_jis', label:':*', labelJis:':*', category:'JIS', ahk:'SC028' },
   { id:'rbracket_jis', label:']}', category:'JIS', ahk:']' },
   { id:'ro', label:'\\ _', category:'JIS', ahk:'SC073' },
   { id:'muhenkan', label:'無変換', category:'JIS', ahk:'SC07B' },
