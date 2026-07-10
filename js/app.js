@@ -926,18 +926,19 @@ function importJSON() {
 }
 
 // ---- AHK 生成 ----
-let _ahkV1 = '', _ahkV2 = '';
+let _ahkV1 = '', _ahkV2 = '', _ahkV2Beta = '';
 
 function switchAhkTab(ver) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('tab-active', +b.dataset.version === ver));
   const t = document.getElementById('ahk-text');
-  t.value = ver === 1 ? _ahkV1 : _ahkV2;
+  t.value = ver === 1 ? _ahkV1 : ver === 3 ? _ahkV2Beta : _ahkV2;
   t.scrollTop = 0;
 }
 
 function generateAHK(version) {
-  _ahkV1 = buildScript(false);
-  _ahkV2 = buildScript(true);
+  _ahkV1 = buildScript('v1');
+  _ahkV2 = buildScript('v2');
+  _ahkV2Beta = buildScript('v2beta');
 
   const overlay = document.getElementById('ahk-overlay');
   const textarea = document.getElementById('ahk-text');
@@ -971,7 +972,9 @@ function generateAHK(version) {
   overlay.classList.remove('hidden');
 }
 
-function buildScript(isV2) {
+function buildScript(mode) {
+  const isV2 = mode === 'v2' || mode === 'v2beta';
+  const isBeta = mode === 'v2beta';
   const EQ = isV2 ? '==' : '=';
   const HO = (n, up) => isV2 ? `$*${n}${up?' up':''}:: {\n` : `$*${n}${up?' up':''}::\n`;
   const HC = isV2 ? '}\n' : '  return\n';
@@ -1062,7 +1065,42 @@ function buildScript(isV2) {
       const parts = mapping.split(':');
       const pn = ahkName(phys), tn = ahkName(parts[1]), ts = `{${tn}}`, sp = phys.replace(/[^a-zA-Z0-9_]/g,'_');
       s += `  ; ModTap: ${pn} -> tap=${tn}`;
-      if (parts[2] === 'layer') {
+      // === Beta: Critical polling approach ===
+      if (isBeta) {
+        if (parts[2] === 'layer') {
+          s += `, hold=MO(${parts[3]})\n`;
+          s += `  ; [β] Critical+30ms 即レイヤ切替\n`;
+          s += `  ${HO(pn,0)}`;
+          s += G(`_busy_${sp}, _MT_${sp}_held, _MO_count, _MO_base, CurrentLayer`);
+          s += `    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
+          s += `    _MT_${sp}_held := false\n    Critical\n    Loop 30 {\n`;
+          s += isV2 ? `      if !GetKeyState("${pn}","P") {\n` : `      if !GetKeyState("${pn}","P") {\n`;
+          s += isV2 ? `  SendInput("{Blind}${ts}")\n` : `  SendInput {Blind}${ts}\n`;
+          s += `        Critical Off\n        _busy_${sp} := false\n        return\n      }\n`;
+          s += isV2 ? `      Sleep(-1)\n    }\n    Critical Off\n` : `      Sleep, -1\n    }\n    Critical Off\n`;
+          s += `    _MT_${sp}_held := true\n    _MO_count++\n`;
+          s += `    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n`;
+          s += `    CurrentLayer := ${parts[3]}\n`;
+          s += KW(pn);
+          s += `    _MO_count--\n    if (_MO_count ${EQ} 0)\n      CurrentLayer := _MO_base\n`;
+          s += `    _busy_${sp} := false\n`;
+          s += HC;
+        } else {
+          const hn = ahkName(parts[2]);
+          s += `, hold=${hn}\n`;
+          s += `  ; [β] Critical+30ms ホールド発動\n`;
+          s += `  ${HO(pn,0)}${G(`_MT_${sp}_held`)}    _MT_${sp}_held := 0\n`;
+          s += `    Critical\n    Loop 30 {\n`;
+          s += isV2 ? `      if !GetKeyState("${pn}","P") {\n` : `      if !GetKeyState("${pn}","P") {\n`;
+          s += isV2 ? `  SendInput("{Blind}${ts}")\n` : `  SendInput {Blind}${ts}\n`;
+          s += `        Critical Off\n        return\n      }\n`;
+          s += isV2 ? `      Sleep(-1)\n    }\n    Critical Off\n` : `      Sleep, -1\n    }\n    Critical Off\n`;
+          s += `    _MT_${sp}_held := 1\n`;
+          s += SDW(hn); s += KW(pn); s += SUP(hn);
+          s += HC;
+        }
+      // === Original approach ===
+      } else if (parts[2] === 'layer') {
         s += `, hold=MO(${parts[3]})\n  ${HO(pn,0)}`;
         s += G(`_busy_${sp}, _MT_${sp}_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer`);
         s += `    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
