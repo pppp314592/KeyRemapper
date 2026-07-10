@@ -1063,23 +1063,18 @@ function buildScript(isV2) {
       const pn = ahkName(phys), tn = ahkName(parts[1]), ts = `{${tn}}`, sp = phys.replace(/[^a-zA-Z0-9_]/g,'_');
       s += `  ; ModTap: ${pn} -> tap=${tn}`;
       if (parts[2] === 'layer') {
-        s += `, hold=MO(${parts[3]})\n  ${HO(pn,0)}`;
-        s += G(`_busy_${sp}, _MT_${sp}_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer`);
+        s += `, hold=MO(${parts[3]})\n`;
+        s += `  ; tap文字を KeyWait より先に送出して順序問題を回避\n`;
+        s += `  ${HO(pn,0)}`;
+        s += G(`_busy_${sp}, _MT_anykey, _MO_count, _MO_base, CurrentLayer`);
         s += `    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
-        s += `    _MT_${sp}_held := false\n    _MT_anykey := 0\n    _MO_count++\n`;
+        s += `    _MT_anykey := 0\n    _MO_count++\n`;
         s += `    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n`;
         s += `    CurrentLayer := ${parts[3]}\n`;
-        s += ST(`_MT_${sp}_chk`, -300);
+        s += isV2 ? `  SendInput("{Blind}${ts}")\n` : `  SendInput {Blind}${ts}\n`;
         s += KW(pn);
-        s += SO(`_MT_${sp}_chk`);
         s += `    _MO_count--\n    if (_MO_count ${EQ} 0)\n      CurrentLayer := _MO_base\n`;
-        s += `    if (!_MT_${sp}_held && !_MT_anykey) {\n`;
-        s += isV2 ? `      SendInput("{Blind}${ts}")\n` : `      SendInput {Blind}${ts}\n`;
-        s += `    }\n`;
         s += HC;
-        s += `  ${FN(`_MT_${sp}_chk`)}`;
-        s += isV2 ? `    global _MT_${sp}_held\n    _MT_${sp}_held := true\n  }\n`
-                  : `    _MT_${sp}_held := true\n  return\n`;
       } else {
         const hn = ahkName(parts[2]);
         s += `, hold=${hn}\n`;
