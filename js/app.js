@@ -1073,7 +1073,7 @@ function buildScript(mode) {
           s += `  ${HO(pn,0)}`;
           s += G(`_busy_${sp}, _MT_${sp}_held, _MO_count, _MO_base, CurrentLayer`);
           s += `    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
-          s += `    _MT_${sp}_held := false\n    if KeyWait("${pn}","T0.03") {\n`;
+          s += `    _MT_${sp}_held := false\n    if KeyWait("${pn}","T0.3") {\n`;
           s += isV2 ? `  SendInput("{Blind}${ts}")\n` : `  SendInput {Blind}${ts}\n`;
           s += `      _busy_${sp} := false\n      return\n    }\n`;
           s += `    _MT_${sp}_held := true\n    _MO_count++\n`;
@@ -1088,7 +1088,7 @@ function buildScript(mode) {
           s += `, hold=${hn}\n`;
           s += `  ; [β] KeyWait+T30ms ホールド発動\n`;
           s += `  ${HO(pn,0)}${G(`_MT_${sp}_held`)}    _MT_${sp}_held := 0\n`;
-          s += `    if KeyWait("${pn}","T0.03") {\n`;
+          s += `    if KeyWait("${pn}","T0.3") {\n`;
           s += isV2 ? `  SendInput("{Blind}${ts}")\n` : `  SendInput {Blind}${ts}\n`;
           s += `      return\n    }\n`;
           s += `    _MT_${sp}_held := 1\n`;

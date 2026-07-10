@@ -1,6 +1,6 @@
 ﻿; ============================================================
 ; KeyRemapper - AutoHotkey v2
-; 2026/7/10 10:17:34 | JIS 109（フル）
+; 2026/7/10 10:22:21 | JIS 109（フル）
 ; ============================================================
 
 #SingleInstance Force
@@ -26,7 +26,7 @@ _busy_j := false
 ; === Layer 0: Default ===
 #HotIf CurrentLayer == 0
   ; ModTap: Space -> tap=Space, hold=MO(1)
-  ; [β] Critical+30ms 即レイヤ切替
+  ; [β] KeyWait+T30ms 即レイヤ切替
   $*Space:: {
     global _busy_space, _MT_space_held, _MO_count, _MO_base, CurrentLayer
     global _busy_space
@@ -34,20 +34,11 @@ _busy_j := false
       return
     _busy_space := true
     _MT_space_held := false
-    Critical
-    start := A_TickCount
-    Loop {
-      if !GetKeyState("Space","P") {
+    if KeyWait("Space","T0.03") {
   SendInput("{Blind}{Space}")
-        Critical 0
-        _busy_space := false
-        return
-      }
-      if (A_TickCount - start > 30)
-        break
-      Sleep(1)
+      _busy_space := false
+      return
     }
-    Critical 0
     _MT_space_held := true
     _MO_count++
     if (_MO_count == 1)
@@ -60,7 +51,7 @@ _busy_j := false
     _busy_space := false
 }
   ; ModTap: f -> tap=f, hold=MO(2)
-  ; [β] Critical+30ms 即レイヤ切替
+  ; [β] KeyWait+T30ms 即レイヤ切替
   $*f:: {
     global _busy_f, _MT_f_held, _MO_count, _MO_base, CurrentLayer
     global _busy_f
@@ -68,20 +59,11 @@ _busy_j := false
       return
     _busy_f := true
     _MT_f_held := false
-    Critical
-    start := A_TickCount
-    Loop {
-      if !GetKeyState("f","P") {
+    if KeyWait("f","T0.03") {
   SendInput("{Blind}{f}")
-        Critical 0
-        _busy_f := false
-        return
-      }
-      if (A_TickCount - start > 30)
-        break
-      Sleep(1)
+      _busy_f := false
+      return
     }
-    Critical 0
     _MT_f_held := true
     _MO_count++
     if (_MO_count == 1)
@@ -94,7 +76,7 @@ _busy_j := false
     _busy_f := false
 }
   ; ModTap: j -> tap=j, hold=MO(3)
-  ; [β] Critical+30ms 即レイヤ切替
+  ; [β] KeyWait+T30ms 即レイヤ切替
   $*j:: {
     global _busy_j, _MT_j_held, _MO_count, _MO_base, CurrentLayer
     global _busy_j
@@ -102,20 +84,11 @@ _busy_j := false
       return
     _busy_j := true
     _MT_j_held := false
-    Critical
-    start := A_TickCount
-    Loop {
-      if !GetKeyState("j","P") {
+    if KeyWait("j","T0.03") {
   SendInput("{Blind}{j}")
-        Critical 0
-        _busy_j := false
-        return
-      }
-      if (A_TickCount - start > 30)
-        break
-      Sleep(1)
+      _busy_j := false
+      return
     }
-    Critical 0
     _MT_j_held := true
     _MO_count++
     if (_MO_count == 1)
