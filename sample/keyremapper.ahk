@@ -1,6 +1,6 @@
 ﻿; ============================================================
 ; KeyRemapper - AutoHotkey v2
-; 2026/7/10 9:32:52 | JIS 109（フル）
+; 2026/7/10 9:28:57 | JIS 109（フル）
 ; ============================================================
 
 #SingleInstance Force
@@ -26,8 +26,8 @@ _busy_j := false
 ; === Layer 0: Default ===
 #HotIf CurrentLayer == 0
   ; ModTap: Space -> tap=Space, hold=MO(1)
-  ; ~ パススルー方式：素のキーを通して順序問題を回避
-  ~$*Space:: {
+  ; tap文字を KeyWait より先に送出して順序問題を回避
+  $*Space:: {
     global _busy_space, _MT_anykey, _MO_count, _MO_base, CurrentLayer
     global _busy_space
     if (_busy_space)
@@ -38,14 +38,15 @@ _busy_j := false
     if (_MO_count == 1)
       _MO_base := CurrentLayer
     CurrentLayer := 1
+  SendInput("{Blind}{Space}")
   KeyWait("Space")
     _MO_count--
     if (_MO_count == 0)
       CurrentLayer := _MO_base
 }
   ; ModTap: f -> tap=f, hold=MO(2)
-  ; ~ パススルー方式：素のキーを通して順序問題を回避
-  ~$*f:: {
+  ; tap文字を KeyWait より先に送出して順序問題を回避
+  $*f:: {
     global _busy_f, _MT_anykey, _MO_count, _MO_base, CurrentLayer
     global _busy_f
     if (_busy_f)
@@ -56,14 +57,15 @@ _busy_j := false
     if (_MO_count == 1)
       _MO_base := CurrentLayer
     CurrentLayer := 2
+  SendInput("{Blind}{f}")
   KeyWait("f")
     _MO_count--
     if (_MO_count == 0)
       CurrentLayer := _MO_base
 }
   ; ModTap: j -> tap=j, hold=MO(3)
-  ; ~ パススルー方式：素のキーを通して順序問題を回避
-  ~$*j:: {
+  ; tap文字を KeyWait より先に送出して順序問題を回避
+  $*j:: {
     global _busy_j, _MT_anykey, _MO_count, _MO_base, CurrentLayer
     global _busy_j
     if (_busy_j)
@@ -74,6 +76,7 @@ _busy_j := false
     if (_MO_count == 1)
       _MO_base := CurrentLayer
     CurrentLayer := 3
+  SendInput("{Blind}{j}")
   KeyWait("j")
     _MO_count--
     if (_MO_count == 0)
@@ -429,18 +432,18 @@ _busy_j := false
 #HotIf
 
 ; === ガードクリア（キーUP時） ===
-  ~$*Space up:: {
+  $*Space up:: {
     global _busy_space
     _busy_space := false
-  }
-  ~$*f up:: {
+}
+  $*f up:: {
     global _busy_f
     _busy_f := false
-  }
-  ~$*j up:: {
+}
+  $*j up:: {
     global _busy_j
     _busy_j := false
-  }
+}
 
 
 ; === 以上 自動生成 ===
