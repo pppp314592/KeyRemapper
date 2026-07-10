@@ -27,6 +27,7 @@
       <button class="btn btn-primary" onclick="exportJSON()">💾 JSON保存</button>
       <button class="btn btn-accent" onclick="generateAHK(2)">⚡ AHK生成</button>
       <a class="btn btn-link" href="https://www.autohotkey.com/" target="_blank" title="AutoHotkey v2 ダウンロード">🔗 AHK入手</a>
+      <a class="btn btn-link" href="https://github.com/pppp314592/KeyRemapper" target="_blank" title="GitHub">🐙 GitHub</a>
       <select id="theme-select" class="theme-select" onchange="setTheme(this.value)">
         <option value="dark">Dark</option>
         <option value="midnight">Midnight</option>
@@ -137,7 +138,6 @@
     <div class="modal-tabs">
       <button class="tab-btn" data-version="1" onclick="switchAhkTab(1)">AHK v1</button>
       <button class="tab-btn tab-active" data-version="2" onclick="switchAhkTab(2)">AHK v2</button>
-      <a class="github-link" href="https://github.com/pppp314592/KeyRemapper" target="_blank" rel="noopener">GitHub ↗</a>
     </div>
     <div class="modal-body">
       <textarea id="ahk-text" class="ahk-textarea" readonly></textarea>
