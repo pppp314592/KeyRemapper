@@ -1064,12 +1064,12 @@ function buildScript(isV2) {
       s += `  ; ModTap: ${pn} -> tap=${tn}`;
       if (parts[2] === 'layer') {
         s += `, hold=MO(${parts[3]})\n`;
-        s += `  ; 250ms ポーリング判定：タップ時即送出、長押し時はレイヤーのみ切替\n`;
+        s += `  ; 50ms ポーリング判定：タップ時即送出、長押し時はレイヤーのみ切替\n`;
         s += `  ${HO(pn,0)}`;
         s += G(`_busy_${sp}, _MT_${sp}_held, _MO_count, _MO_base, CurrentLayer`);
         s += `    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
         s += `    _MT_${sp}_held := false\n`;
-        s += `    Loop 25 {\n`;
+        s += `    Loop 5 {\n`;
         s += isV2 ? `      Sleep(10)\n` : `      Sleep, 10\n`;
         s += isV2 ? `      if !GetKeyState("${pn}","P") {\n` : `      if !GetKeyState("${pn}","P") {\n`;
         s += isV2 ? `  SendInput("{Blind}${ts}")\n` : `  SendInput {Blind}${ts}\n`;
@@ -1085,11 +1085,11 @@ function buildScript(isV2) {
       } else {
         const hn = ahkName(parts[2]);
         s += `, hold=${hn}\n`;
-        s += `  ; 250ms ポーリング判定：タップ時即文字、長押し時のみホールド発動\n`;
+        s += `  ; 50ms ポーリング判定：タップ時即文字、長押し時のみホールド発動\n`;
         s += `  ${HO(pn,0)}`;
         s += G(`_MT_${sp}_held`);
         s += `    _MT_${sp}_held := 0\n`;
-        s += `    Loop 25 {\n`;
+        s += `    Loop 5 {\n`;
         s += isV2 ? `      Sleep(10)\n` : `      Sleep, 10\n`;
         s += isV2 ? `      if !GetKeyState("${pn}","P") {\n` : `      if !GetKeyState("${pn}","P") {\n`;
         s += isV2 ? `  SendInput("{Blind}${ts}")\n` : `  SendInput {Blind}${ts}\n`;
