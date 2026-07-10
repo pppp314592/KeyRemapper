@@ -800,7 +800,6 @@ function updateApplyButton() {
   } else {
     btn.disabled = false;
   }
-  updateApplyButton();
 }
 
 function onModTapHoldTypeChange() {
@@ -822,6 +821,7 @@ function onModTapHoldTypeChange() {
       }
     });
   }
+  updateApplyButton();
 }
 
 function onModTapSearch() {
