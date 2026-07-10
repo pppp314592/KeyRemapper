@@ -7,7 +7,7 @@
       "mappings": {
         "space": "modtap:space:layer:1",
         "f": "modtap:f:layer:2",
-        "j": "modtap:j:layer:3"
+        "caret": "modtap:caret:layer:3"
       }
     },
     {

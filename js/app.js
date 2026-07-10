@@ -796,7 +796,7 @@ function updateApplyButton() {
   if (type === 'key') {
     const selected = document.querySelector('#remap-key-list .remap-key-item.selected');
     const items = document.querySelectorAll('#remap-key-list .remap-key-item');
-    btn.disabled = items.length > 1 && !selected;
+    btn.disabled = items.length !== 1 && !selected;
   } else {
     btn.disabled = false;
   }

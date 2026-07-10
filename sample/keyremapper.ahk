@@ -1,6 +1,6 @@
 ﻿; ============================================================
 ; KeyRemapper - AutoHotkey v2
-; 2026/7/10 10:46:01 | JIS 109（フル）
+; 2026/7/10 13:50:53 | JIS 109（フル）
 ; ============================================================
 
 #SingleInstance Force
@@ -15,7 +15,7 @@ _MO_count := 0
 ; === ガード変数 ===
 _busy_space := false
 _busy_f := false
-_busy_j := false
+_busy_caret := false
 
 ; === レイヤー定義 ===
 ; Layer 0: Default
@@ -26,7 +26,7 @@ _busy_j := false
 ; === Layer 0: Default ===
 #HotIf CurrentLayer == 0
   ; ModTap: Space -> tap=Space, hold=MO(1)
-  ; [β] Critical〜30msブロック
+  ; Critical〜30msブロック
   $*Space:: {
     global _busy_space, _MT_space_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer
     global _busy_space
@@ -58,7 +58,7 @@ _busy_j := false
     _MT_space_held := true
   }
   ; ModTap: f -> tap=f, hold=MO(2)
-  ; [β] Critical〜30msブロック
+  ; Critical〜30msブロック
   $*f:: {
     global _busy_f, _MT_f_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer
     global _busy_f
@@ -89,15 +89,15 @@ _busy_j := false
     global _MT_f_held
     _MT_f_held := true
   }
-  ; ModTap: j -> tap=j, hold=MO(3)
-  ; [β] Critical〜30msブロック
-  $*j:: {
-    global _busy_j, _MT_j_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer
-    global _busy_j
-    if (_busy_j)
+  ; ModTap: sc00d -> tap=sc00d, hold=MO(3)
+  ; Critical〜30msブロック
+  $*sc00d:: {
+    global _busy_caret, _MT_caret_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer
+    global _busy_caret
+    if (_busy_caret)
       return
-    _busy_j := true
-    _MT_j_held := false
+    _busy_caret := true
+    _MT_caret_held := false
     _MT_anykey := 0
     _MO_count++
     if (_MO_count == 1)
@@ -107,19 +107,19 @@ _busy_j := false
     Sleep(1)
     Sleep(1)
     Critical 0
-  SetTimer(_MT_j_chk,-300)
-  KeyWait("j")
-  SetTimer(_MT_j_chk,0)
+  SetTimer(_MT_caret_chk,-300)
+  KeyWait("sc00d")
+  SetTimer(_MT_caret_chk,0)
     _MO_count--
     if (_MO_count == 0)
       CurrentLayer := _MO_base
-    if (!_MT_j_held && !_MT_anykey) {
-      SendInput("{Blind}{j}")
+    if (!_MT_caret_held && !_MT_anykey) {
+      SendInput("{Blind}{sc00d}")
     }
 }
-  _MT_j_chk() {
-    global _MT_j_held
-    _MT_j_held := true
+  _MT_caret_chk() {
+    global _MT_caret_held
+    _MT_caret_held := true
   }
 #HotIf
 
@@ -479,9 +479,9 @@ _busy_j := false
     global _busy_f
     _busy_f := false
 }
-  $*j up:: {
-    global _busy_j
-    _busy_j := false
+  $*sc00d up:: {
+    global _busy_caret
+    _busy_caret := false
 }
 
 
