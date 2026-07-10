@@ -127,6 +127,7 @@ body {
 .btn:hover { background:var(--key-hover); border-color:#ffffff40; }
 .btn-primary { background:var(--accent); border-color:var(--accent); color:#fff; }
 .btn-primary:hover { background:#d13d55; }
+.btn-primary:disabled { background:var(--bg2); border-color:var(--text-dim); color:var(--text-dim); opacity:0.5; cursor:not-allowed; }
 .btn-accent { background:var(--accent2); border-color:var(--accent2); color:#1a1a2e; font-weight:600; }
 .btn-accent:hover { background:#6de0fc; }
 .btn-small { padding:4px 10px; font-size:13px; }
