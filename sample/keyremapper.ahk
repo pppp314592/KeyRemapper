@@ -1,6 +1,6 @@
 ﻿; ============================================================
 ; KeyRemapper - AutoHotkey v2
-; 2026/7/10 10:22:21 | JIS 109（フル）
+; 2026/7/10 10:26:25 | JIS 109（フル）
 ; ============================================================
 
 #SingleInstance Force
@@ -34,7 +34,7 @@ _busy_j := false
       return
     _busy_space := true
     _MT_space_held := false
-    if KeyWait("Space","T0.03") {
+    if KeyWait("Space","T0.3") {
   SendInput("{Blind}{Space}")
       _busy_space := false
       return
@@ -59,7 +59,7 @@ _busy_j := false
       return
     _busy_f := true
     _MT_f_held := false
-    if KeyWait("f","T0.03") {
+    if KeyWait("f","T0.3") {
   SendInput("{Blind}{f}")
       _busy_f := false
       return
@@ -84,7 +84,7 @@ _busy_j := false
       return
     _busy_j := true
     _MT_j_held := false
-    if KeyWait("j","T0.03") {
+    if KeyWait("j","T0.3") {
   SendInput("{Blind}{j}")
       _busy_j := false
       return

@@ -1065,33 +1065,42 @@ function buildScript(mode) {
       const parts = mapping.split(':');
       const pn = ahkName(phys), tn = ahkName(parts[1]), ts = `{${tn}}`, sp = phys.replace(/[^a-zA-Z0-9_]/g,'_');
       s += `  ; ModTap: ${pn} -> tap=${tn}`;
-      // === Beta: KeyWait+T30ms approach ===
+      // === Beta: 300ms polling + _MT_anykey ===
       if (isBeta) {
         if (parts[2] === 'layer') {
           s += `, hold=MO(${parts[3]})\n`;
-          s += `  ; [β] KeyWait+T30ms 即レイヤ切替\n`;
+          s += `  ; [β] 300ms polling + _MT_anykey\n`;
           s += `  ${HO(pn,0)}`;
-          s += G(`_busy_${sp}, _MT_${sp}_held, _MO_count, _MO_base, CurrentLayer`);
+          s += G(`_busy_${sp}, _MT_${sp}_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer`);
           s += `    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
-          s += `    _MT_${sp}_held := false\n    if KeyWait("${pn}","T0.3") {\n`;
-          s += isV2 ? `  SendInput("{Blind}${ts}")\n` : `  SendInput {Blind}${ts}\n`;
-          s += `      _busy_${sp} := false\n      return\n    }\n`;
-          s += `    _MT_${sp}_held := true\n    _MO_count++\n`;
-          s += `    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n`;
-          s += `    CurrentLayer := ${parts[3]}\n`;
+          s += `    _MT_${sp}_held := false\n    _MT_anykey := 0\n    start := A_TickCount\n    Loop {\n`;
+          s += `      if !GetKeyState("${pn}","P") {\n`;
+          s += `        if (_MT_anykey) {\n    _MT_${sp}_held := true\n    _MO_count++\n    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n    CurrentLayer := ${parts[3]}\n`;
           s += KW(pn);
-          s += `    _MO_count--\n    if (_MO_count ${EQ} 0)\n      CurrentLayer := _MO_base\n`;
-          s += `    _busy_${sp} := false\n`;
+          s += `    _MO_count--\n    if (_MO_count ${EQ} 0)\n      CurrentLayer := _MO_base\n    _busy_${sp} := false\n          return\n        }\n`;
+          s += isV2 ? `  SendInput("{Blind}${ts}")\n` : `  SendInput {Blind}${ts}\n`;
+          s += `        _busy_${sp} := false\n        return\n      }\n`;
+          s += `      if (_MT_anykey) {\n    _MT_${sp}_held := true\n    _MO_count++\n    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n    CurrentLayer := ${parts[3]}\n`;
+          s += KW(pn);
+          s += `    _MO_count--\n    if (_MO_count ${EQ} 0)\n      CurrentLayer := _MO_base\n    _busy_${sp} := false\n        return\n      }\n`;
+          s += `      if (A_TickCount - start > 300)\n        break\n`;
+          s += isV2 ? `      Sleep(1)\n    }\n` : `      Sleep, 1\n    }\n`;
+          s += `    _MT_${sp}_held := true\n    _MO_count++\n    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n    CurrentLayer := ${parts[3]}\n`;
+          s += KW(pn);
+          s += `    _MO_count--\n    if (_MO_count ${EQ} 0)\n      CurrentLayer := _MO_base\n    _busy_${sp} := false\n`;
           s += HC;
         } else {
           const hn = ahkName(parts[2]);
           s += `, hold=${hn}\n`;
-          s += `  ; [β] KeyWait+T30ms ホールド発動\n`;
-          s += `  ${HO(pn,0)}${G(`_MT_${sp}_held`)}    _MT_${sp}_held := 0\n`;
-          s += `    if KeyWait("${pn}","T0.3") {\n`;
+          s += `  ; [β] 300ms polling + _MT_anykey\n`;
+          s += `  ${HO(pn,0)}${G(`_MT_${sp}_held, _MT_anykey`)}    _MT_${sp}_held := 0\n    _MT_anykey := 0\n    start := A_TickCount\n    Loop {\n`;
+          s += `      if !GetKeyState("${pn}","P") {\n`;
+          s += `        if (_MT_anykey) {\n${SDW(hn)}${KW(pn)}${SUP(hn)}          return\n        }\n`;
           s += isV2 ? `  SendInput("{Blind}${ts}")\n` : `  SendInput {Blind}${ts}\n`;
-          s += `      return\n    }\n`;
-          s += `    _MT_${sp}_held := 1\n`;
+          s += `        return\n      }\n`;
+          s += `      if (_MT_anykey) {\n${SDW(hn)}${KW(pn)}${SUP(hn)}        return\n      }\n`;
+          s += `      if (A_TickCount - start > 300)\n        break\n`;
+          s += isV2 ? `      Sleep(1)\n    }\n` : `      Sleep, 1\n    }\n`;
           s += SDW(hn); s += KW(pn); s += SUP(hn);
           s += HC;
         }
