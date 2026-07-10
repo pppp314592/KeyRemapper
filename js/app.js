@@ -654,10 +654,10 @@ function openRemapDialog(layerIdx, keyId) {
     document.getElementById('remap-modtap-hold-type').value = holdType;
     setTimeout(() => {
       const t1 = document.querySelector(`#remap-modtap-tap-list .remap-key-item[data-key-id="${parts[1]}"]`);
-      if (t1) t1.classList.add('selected');
+      if (t1) { t1.classList.add('selected'); t1.scrollIntoView({ block: 'nearest' }); }
       if (holdType === 'key') {
         const t2 = document.querySelector(`#remap-modtap-hold-list .remap-key-item[data-key-id="${parts[2]}"]`);
-        if (t2) t2.classList.add('selected');
+        if (t2) { t2.classList.add('selected'); t2.scrollIntoView({ block: 'nearest' }); }
       }
     }, 50);
     document.getElementById('remap-modtap-hold-key').classList.toggle('hidden', holdType !== 'key');
