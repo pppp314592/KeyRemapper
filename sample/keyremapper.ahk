@@ -1,6 +1,6 @@
 ﻿; ============================================================
 ; KeyRemapper - AutoHotkey v2
-; 2026/7/10 9:43:37 | JIS 109（フル）
+; 2026/7/10 9:48:55 | JIS 109（フル）
 ; ============================================================
 
 #SingleInstance Force
@@ -26,7 +26,7 @@ _busy_j := false
 ; === Layer 0: Default ===
 #HotIf CurrentLayer == 0
   ; ModTap: Space -> tap=Space, hold=MO(1)
-  ; 10ms 判定：タップ時即送出、長押し時はレイヤーのみ切替
+  ; 50ms ポーリング判定：タップ時即送出、長押し時はレイヤーのみ切替
   $*Space:: {
     global _busy_space, _MT_space_held, _MO_count, _MO_base, CurrentLayer
     global _busy_space
@@ -34,9 +34,14 @@ _busy_j := false
       return
     _busy_space := true
     _MT_space_held := false
-    if !KeyWait("Space","T0.01") {
+    Loop 5 {
+      Sleep(10)
+      if !GetKeyState("Space","P") {
   SendInput("{Blind}{Space}")
-    } else {
+        break
+      }
+    }
+    if GetKeyState("Space","P") {
       _MT_space_held := true
       _MO_count++
       if (_MO_count == 1)
@@ -50,7 +55,7 @@ _busy_j := false
     _busy_space := false
 }
   ; ModTap: f -> tap=f, hold=MO(2)
-  ; 10ms 判定：タップ時即送出、長押し時はレイヤーのみ切替
+  ; 50ms ポーリング判定：タップ時即送出、長押し時はレイヤーのみ切替
   $*f:: {
     global _busy_f, _MT_f_held, _MO_count, _MO_base, CurrentLayer
     global _busy_f
@@ -58,9 +63,14 @@ _busy_j := false
       return
     _busy_f := true
     _MT_f_held := false
-    if !KeyWait("f","T0.01") {
+    Loop 5 {
+      Sleep(10)
+      if !GetKeyState("f","P") {
   SendInput("{Blind}{f}")
-    } else {
+        break
+      }
+    }
+    if GetKeyState("f","P") {
       _MT_f_held := true
       _MO_count++
       if (_MO_count == 1)
@@ -74,7 +84,7 @@ _busy_j := false
     _busy_f := false
 }
   ; ModTap: j -> tap=j, hold=MO(3)
-  ; 10ms 判定：タップ時即送出、長押し時はレイヤーのみ切替
+  ; 50ms ポーリング判定：タップ時即送出、長押し時はレイヤーのみ切替
   $*j:: {
     global _busy_j, _MT_j_held, _MO_count, _MO_base, CurrentLayer
     global _busy_j
@@ -82,9 +92,14 @@ _busy_j := false
       return
     _busy_j := true
     _MT_j_held := false
-    if !KeyWait("j","T0.01") {
+    Loop 5 {
+      Sleep(10)
+      if !GetKeyState("j","P") {
   SendInput("{Blind}{j}")
-    } else {
+        break
+      }
+    }
+    if GetKeyState("j","P") {
       _MT_j_held := true
       _MO_count++
       if (_MO_count == 1)
