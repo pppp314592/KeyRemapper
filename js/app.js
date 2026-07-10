@@ -1065,19 +1065,17 @@ function buildScript(mode) {
       const parts = mapping.split(':');
       const pn = ahkName(phys), tn = ahkName(parts[1]), ts = `{${tn}}`, sp = phys.replace(/[^a-zA-Z0-9_]/g,'_');
       s += `  ; ModTap: ${pn} -> tap=${tn}`;
-      // === Beta: Critical polling approach ===
+      // === Beta: KeyWait+T30ms approach ===
       if (isBeta) {
         if (parts[2] === 'layer') {
           s += `, hold=MO(${parts[3]})\n`;
-          s += `  ; [β] Critical+30ms 即レイヤ切替\n`;
+          s += `  ; [β] KeyWait+T30ms 即レイヤ切替\n`;
           s += `  ${HO(pn,0)}`;
           s += G(`_busy_${sp}, _MT_${sp}_held, _MO_count, _MO_base, CurrentLayer`);
           s += `    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
-          s += `    _MT_${sp}_held := false\n    Critical\n    start := A_TickCount\n    Loop {\n`;
-          s += isV2 ? `      if !GetKeyState("${pn}","P") {\n` : `      if !GetKeyState("${pn}","P") {\n`;
+          s += `    _MT_${sp}_held := false\n    if KeyWait("${pn}","T0.03") {\n`;
           s += isV2 ? `  SendInput("{Blind}${ts}")\n` : `  SendInput {Blind}${ts}\n`;
-          s += `        Critical 0\n        _busy_${sp} := false\n        return\n      }\n`;
-          s += isV2 ? `      if (A_TickCount - start > 30)\n        break\n      Sleep(1)\n    }\n    Critical 0\n` : `      if (A_TickCount - start > 30)\n        break\n      Sleep, 1\n    }\n    Critical Off\n`;
+          s += `      _busy_${sp} := false\n      return\n    }\n`;
           s += `    _MT_${sp}_held := true\n    _MO_count++\n`;
           s += `    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n`;
           s += `    CurrentLayer := ${parts[3]}\n`;
@@ -1088,13 +1086,11 @@ function buildScript(mode) {
         } else {
           const hn = ahkName(parts[2]);
           s += `, hold=${hn}\n`;
-          s += `  ; [β] Critical+30ms ホールド発動\n`;
+          s += `  ; [β] KeyWait+T30ms ホールド発動\n`;
           s += `  ${HO(pn,0)}${G(`_MT_${sp}_held`)}    _MT_${sp}_held := 0\n`;
-          s += `    Critical\n    start := A_TickCount\n    Loop {\n`;
-          s += isV2 ? `      if !GetKeyState("${pn}","P") {\n` : `      if !GetKeyState("${pn}","P") {\n`;
+          s += `    if KeyWait("${pn}","T0.03") {\n`;
           s += isV2 ? `  SendInput("{Blind}${ts}")\n` : `  SendInput {Blind}${ts}\n`;
-          s += isV2 ? `        Critical 0\n        return\n      }\n` : `        Critical Off\n        return\n      }\n`;
-          s += isV2 ? `      if (A_TickCount - start > 30)\n        break\n      Sleep(1)\n    }\n    Critical 0\n` : `      if (A_TickCount - start > 30)\n        break\n      Sleep, 1\n    }\n    Critical Off\n`;
+          s += `      return\n    }\n`;
           s += `    _MT_${sp}_held := 1\n`;
           s += SDW(hn); s += KW(pn); s += SUP(hn);
           s += HC;

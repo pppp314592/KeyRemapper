@@ -1,6 +1,6 @@
 ﻿; ============================================================
 ; KeyRemapper - AutoHotkey v2
-; 2026/7/10 10:13:41 | JIS 109（フル）
+; 2026/7/10 10:17:34 | JIS 109（フル）
 ; ============================================================
 
 #SingleInstance Force
@@ -35,14 +35,17 @@ _busy_j := false
     _busy_space := true
     _MT_space_held := false
     Critical
-    Loop 30 {
+    start := A_TickCount
+    Loop {
       if !GetKeyState("Space","P") {
   SendInput("{Blind}{Space}")
         Critical 0
         _busy_space := false
         return
       }
-      Sleep(-1)
+      if (A_TickCount - start > 30)
+        break
+      Sleep(1)
     }
     Critical 0
     _MT_space_held := true
@@ -66,14 +69,17 @@ _busy_j := false
     _busy_f := true
     _MT_f_held := false
     Critical
-    Loop 30 {
+    start := A_TickCount
+    Loop {
       if !GetKeyState("f","P") {
   SendInput("{Blind}{f}")
         Critical 0
         _busy_f := false
         return
       }
-      Sleep(-1)
+      if (A_TickCount - start > 30)
+        break
+      Sleep(1)
     }
     Critical 0
     _MT_f_held := true
@@ -97,14 +103,17 @@ _busy_j := false
     _busy_j := true
     _MT_j_held := false
     Critical
-    Loop 30 {
+    start := A_TickCount
+    Loop {
       if !GetKeyState("j","P") {
   SendInput("{Blind}{j}")
         Critical 0
         _busy_j := false
         return
       }
-      Sleep(-1)
+      if (A_TickCount - start > 30)
+        break
+      Sleep(1)
     }
     Critical 0
     _MT_j_held := true
