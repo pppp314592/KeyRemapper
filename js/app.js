@@ -1064,16 +1064,24 @@ function buildScript(isV2) {
       s += `  ; ModTap: ${pn} -> tap=${tn}`;
       if (parts[2] === 'layer') {
         s += `, hold=MO(${parts[3]})\n`;
-        s += `  ; ~ パススルー方式：素のキーを通して順序問題を回避\n`;
+        s += `  ; ~ パススルー＋長押し時 Backspace 打ち消し\n`;
         s += isV2
-          ? `  ~$*${pn}:: {\n    global _busy_${sp}, _MT_anykey, _MO_count, _MO_base, CurrentLayer\n    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`
-          : `  ~$*${pn}::\n    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
-        s += `    _MT_anykey := 0\n    _MO_count++\n`;
+          ? `  ~$*${pn}:: {\n    global _busy_${sp}, _MT_${sp}_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer\n    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`
+          : `  ~$*${pn}::\n    global _busy_${sp}, _MT_${sp}_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
+        s += `    _MT_${sp}_held := false\n    _MT_anykey := 0\n    _MO_count++\n`;
         s += `    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n`;
         s += `    CurrentLayer := ${parts[3]}\n`;
+        s += ST(`_MT_${sp}_chk`, '-200');
         s += KW(pn);
+        s += SO(`_MT_${sp}_chk`);
         s += `    _MO_count--\n    if (_MO_count ${EQ} 0)\n      CurrentLayer := _MO_base\n`;
         s += HC;
+        s += `  ${FN(`_MT_${sp}_chk`)}`;
+        s += isV2 ? `    global _MT_${sp}_held, _MT_anykey\n` : '';
+        s += `    if !GetKeyState("${pn}","P")\n      return\n    _MT_${sp}_held := true\n`;
+        s += `    if (!_MT_anykey)\n`;
+        s += isV2 ? `  SendInput("{Blind}{Backspace}")\n` : `  SendInput {Blind}{Backspace}\n`;
+        s += isV2 ? `  }\n` : `  return\n`;
       } else {
         const hn = ahkName(parts[2]);
         s += `, hold=${hn}\n`;
