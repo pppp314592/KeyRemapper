@@ -1064,41 +1064,39 @@ function buildScript(isV2) {
       s += `  ; ModTap: ${pn} -> tap=${tn}`;
       if (parts[2] === 'layer') {
         s += `, hold=MO(${parts[3]})\n`;
-        s += `  ; ~ パススルー＋長押し時 Backspace 打ち消し\n`;
+        s += `  ; 10ms 判定：タップ時即送出、長押し時はレイヤーのみ切替\n`;
+        s += `  ${HO(pn,0)}`;
+        s += G(`_busy_${sp}, _MT_${sp}_held, _MO_count, _MO_base, CurrentLayer`);
+        s += `    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
+        s += `    _MT_${sp}_held := false\n`;
         s += isV2
-          ? `  ~$*${pn}:: {\n    global _busy_${sp}, _MT_${sp}_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer\n    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`
-          : `  ~$*${pn}::\n    global _busy_${sp}, _MT_${sp}_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
-        s += `    _MT_${sp}_held := false\n    _MT_anykey := 0\n    _MO_count++\n`;
-        s += `    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n`;
-        s += `    CurrentLayer := ${parts[3]}\n`;
-        s += ST(`_MT_${sp}_chk`, '-200');
+          ? `    if !KeyWait("${pn}","T0.01") {\n`
+          : `    KeyWait, ${pn}, T0.01\n    if !ErrorLevel {\n`;
+        s += isV2 ? `  SendInput("{Blind}${ts}")\n` : `  SendInput {Blind}${ts}\n`;
+        s += `    } else {\n`;
+        s += `      _MT_${sp}_held := true\n      _MO_count++\n`;
+        s += `      if (_MO_count ${EQ} 1)\n        _MO_base := CurrentLayer\n`;
+        s += `      CurrentLayer := ${parts[3]}\n`;
         s += KW(pn);
-        s += SO(`_MT_${sp}_chk`);
-        s += `    _MO_count--\n    if (_MO_count ${EQ} 0)\n      CurrentLayer := _MO_base\n`;
+        s += `      _MO_count--\n      if (_MO_count ${EQ} 0)\n        CurrentLayer := _MO_base\n`;
+        s += `    }\n    _busy_${sp} := false\n`;
         s += HC;
-        s += `  ${FN(`_MT_${sp}_chk`)}`;
-        s += isV2 ? `    global _MT_${sp}_held, _MT_anykey\n` : '';
-        s += `    if !GetKeyState("${pn}","P")\n      return\n    _MT_${sp}_held := true\n`;
-        s += `    if (!_MT_anykey)\n`;
-        s += isV2 ? `  SendInput("{Blind}{Backspace}")\n` : `  SendInput {Blind}{Backspace}\n`;
-        s += isV2 ? `  }\n` : `  return\n`;
       } else {
         const hn = ahkName(parts[2]);
         s += `, hold=${hn}\n`;
-        s += `  ; ~ パススルー方式：素のキーを通し、長押し時のみ Backspace で打ち消し\n`;
+        s += `  ; 10ms 判定：タップ時即文字、長押し時のみホールド発動\n`;
+        s += `  ${HO(pn,0)}`;
+        s += G(`_MT_${sp}_held`);
+        s += `    _MT_${sp}_held := 0\n`;
         s += isV2
-          ? `  ~$*${pn}:: {\n    global _MT_${sp}_held, _MT_anykey\n    _MT_anykey := 1\n    _MT_${sp}_held := 0\n`
-          : `  ~$*${pn}::\n    _MT_anykey := 1\n    _MT_${sp}_held := 0\n`;
-        s += ST(`_MT_${sp}_chk`, '-200');
-        s += HC;
-        s += `  ${FN(`_MT_${sp}_chk`)}${G(`_MT_${sp}_held`)}    if (_MT_${sp}_held)\n      return\n`;
-        s += `    if !GetKeyState("${pn}","P")\n      return\n    _MT_${sp}_held := 1\n`;
-        s += isV2 ? `  SendInput("{Blind}{Backspace}")\n` : `  SendInput {Blind}{Backspace}\n`;
+          ? `    if !KeyWait("${pn}","T0.01") {\n`
+          : `    KeyWait, ${pn}, T0.01\n    if !ErrorLevel {\n`;
+        s += isV2 ? `  SendInput("{Blind}${ts}")\n` : `  SendInput {Blind}${ts}\n`;
+        s += `    } else {\n`;
+        s += `      _MT_${sp}_held := 1\n`;
         s += SDW(hn); s += KW(pn); s += SUP(hn);
-        s += isV2 ? `  }\n` : `  return\n`;
-        s += isV2
-          ? `  ~$*${pn} up:: {\n    global _MT_${sp}_held\n  SetTimer(_MT_${sp}_chk,0)\n    _MT_${sp}_held := 0\n  }\n`
-          : `  ~$*${pn} up::\n  SetTimer, _MT_${sp}_chk, Off\n    _MT_${sp}_held := 0\n  return\n`;
+        s += `    }\n`;
+        s += HC;
       }
     });
 
@@ -1126,8 +1124,8 @@ function buildScript(isV2) {
     moGuardKeys.forEach(phys => {
       const kn = ahkName(phys), sf = phys.replace(/[^a-zA-Z0-9_]/g,'_');
       s += isV2
-        ? `  ~$*${kn} up:: {\n${G(`_busy_${sf}`)}    _busy_${sf} := false\n  }\n`
-        : `  ~$*${kn} up::\n    _busy_${sf} := false\n  return\n`;
+        ? `  $*${kn} up:: {\n${G(`_busy_${sf}`)}    _busy_${sf} := false\n  }\n`
+        : `  $*${kn} up::\n    _busy_${sf} := false\n  return\n`;
     });
     s += `\n`;
   }
