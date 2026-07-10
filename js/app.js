@@ -763,7 +763,17 @@ function populateKeyList(containerId, filter, mode) {
   });
   if (containerId === 'remap-key-list') {
     const items = container.querySelectorAll('.remap-key-item');
-    if (items.length === 1) items[0].classList.add('selected');
+    if (items.length === 1) {
+      items[0].classList.add('selected');
+    } else if (filter) {
+      const f = filter.toLowerCase();
+      for (const item of items) {
+        if (item.dataset.keyId === f) {
+          item.classList.add('selected');
+          break;
+        }
+      }
+    }
     updateApplyButton();
   }
 }
