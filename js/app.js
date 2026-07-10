@@ -645,6 +645,7 @@ function openRemapDialog(layerIdx, keyId) {
     setTimeout(() => {
       const t = document.querySelector(`.remap-key-item[data-key-id="${current}"]`);
       if (t) t.classList.add('selected');
+      updateApplyButton();
     }, 50);
   }
   if (type === 'modtap') {
@@ -701,6 +702,8 @@ function onRemapTypeChange() {
 
   if (type === 'key') {
     populateKeyList('remap-key-list', '', null);
+    document.getElementById('remap-key-search').focus();
+    updateApplyButton();
   }
   if (type === 'modtap') {
     document.getElementById('remap-modtap-hold-type').value = 'key';
@@ -754,14 +757,33 @@ function populateKeyList(containerId, filter, mode) {
     div.onclick = () => {
       container.querySelectorAll('.remap-key-item').forEach(el => el.classList.remove('selected'));
       div.classList.add('selected');
+      if (containerId === 'remap-key-list') updateApplyButton();
     };
     container.appendChild(div);
   });
+  if (containerId === 'remap-key-list') {
+    const items = container.querySelectorAll('.remap-key-item');
+    if (items.length === 1) items[0].classList.add('selected');
+    updateApplyButton();
+  }
 }
 
 function onRemapSearch() {
   const q = document.getElementById('remap-key-search').value;
   populateKeyList('remap-key-list', q, null);
+  updateApplyButton();
+}
+
+function updateApplyButton() {
+  const type = document.getElementById('remap-type-select').value;
+  const btn = document.getElementById('remap-apply-btn');
+  if (type === 'key') {
+    const selected = document.querySelector('#remap-key-list .remap-key-item.selected');
+    const items = document.querySelectorAll('#remap-key-list .remap-key-item');
+    btn.disabled = items.length > 1 && !selected;
+  } else {
+    btn.disabled = false;
+  }
 }
 
 function onModTapHoldTypeChange() {
@@ -820,7 +842,12 @@ function applyRemap() {
     }
   } else {
     const selected = document.querySelector('#remap-key-list .remap-key-item.selected');
-    raw = selected ? selected.dataset.keyId : keyId;
+    if (selected) {
+      raw = selected.dataset.keyId;
+    } else {
+      const items = document.querySelectorAll('#remap-key-list .remap-key-item');
+      raw = items.length === 1 ? items[0].dataset.keyId : keyId;
+    }
   }
 
   state.layers[layerIdx].mappings[keyId] = raw;
