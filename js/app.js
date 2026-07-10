@@ -709,7 +709,6 @@ function onRemapTypeChange() {
   if (type === 'key') {
     populateKeyList('remap-key-list', '', null);
     document.getElementById('remap-key-search').focus();
-    updateApplyButton();
   }
   if (type === 'modtap') {
     document.getElementById('remap-modtap-hold-type').value = 'key';
@@ -730,6 +729,7 @@ function onRemapTypeChange() {
       }
     });
   }
+  updateApplyButton();
 }
 
 function populateKeyList(containerId, filter, mode) {
@@ -800,6 +800,7 @@ function updateApplyButton() {
   } else {
     btn.disabled = false;
   }
+  updateApplyButton();
 }
 
 function onModTapHoldTypeChange() {
