@@ -926,19 +926,18 @@ function importJSON() {
 }
 
 // ---- AHK 生成 ----
-let _ahkV1 = '', _ahkV2 = '', _ahkV2Beta = '';
+let _ahkV1 = '', _ahkV2 = '';
 
 function switchAhkTab(ver) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('tab-active', +b.dataset.version === ver));
   const t = document.getElementById('ahk-text');
-  t.value = ver === 1 ? _ahkV1 : ver === 3 ? _ahkV2Beta : _ahkV2;
+  t.value = ver === 1 ? _ahkV1 : _ahkV2;
   t.scrollTop = 0;
 }
 
 function generateAHK(version) {
   _ahkV1 = buildScript('v1');
   _ahkV2 = buildScript('v2');
-  _ahkV2Beta = buildScript('v2beta');
 
   const overlay = document.getElementById('ahk-overlay');
   const textarea = document.getElementById('ahk-text');
@@ -973,8 +972,7 @@ function generateAHK(version) {
 }
 
 function buildScript(mode) {
-  const isV2 = mode === 'v2' || mode === 'v2beta';
-  const isBeta = mode === 'v2beta';
+  const isV2 = mode === 'v2';
   const EQ = isV2 ? '==' : '=';
   const HO = (n, up) => isV2 ? `$*${n}${up?' up':''}:: {\n` : `$*${n}${up?' up':''}::\n`;
   const HC = isV2 ? '}\n' : '  return\n';
@@ -1065,55 +1063,17 @@ function buildScript(mode) {
       const parts = mapping.split(':');
       const pn = ahkName(phys), tn = ahkName(parts[1]), ts = `{${tn}}`, sp = phys.replace(/[^a-zA-Z0-9_]/g,'_');
       s += `  ; ModTap: ${pn} -> tap=${tn}`;
-      // === Beta: Critical〜30msブロック + 元のSetTimer方式 ===
-      if (isBeta) {
-        if (parts[2] === 'layer') {
-          s += `, hold=MO(${parts[3]})\n`;
-          s += `  ; [β] Critical〜30msブロック\n`;
-          s += `  ${HO(pn,0)}`;
-          s += G(`_busy_${sp}, _MT_${sp}_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer`);
-          s += `    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
-          s += `    _MT_${sp}_held := false\n    _MT_anykey := 0\n    _MO_count++\n`;
-          s += `    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n`;
-          s += `    CurrentLayer := ${parts[3]}\n`;
-          s += `    Critical\n    Sleep(1)\n    Sleep(1)\n    Critical 0\n`;
-          s += ST(`_MT_${sp}_chk`, -300);
-          s += KW(pn);
-          s += SO(`_MT_${sp}_chk`);
-          s += `    _MO_count--\n    if (_MO_count ${EQ} 0)\n      CurrentLayer := _MO_base\n`;
-          s += `    if (!_MT_${sp}_held && !_MT_anykey) {\n`;
-          s += isV2 ? `      SendInput("{Blind}${ts}")\n` : `      SendInput {Blind}${ts}\n`;
-          s += `    }\n`;
-          s += HC;
-          s += `  ${FN(`_MT_${sp}_chk`)}`;
-          s += isV2 ? `    global _MT_${sp}_held\n    _MT_${sp}_held := true\n  }\n`
-                    : `    _MT_${sp}_held := true\n  return\n`;
-        } else {
-          const hn = ahkName(parts[2]);
-          s += `, hold=${hn}\n`;
-          s += `  ; [β] Critical〜30msブロック\n`;
-          s += `  ${HO(pn,0)}${G(`_MT_${sp}_held, _MT_anykey`)}    _MT_anykey := 1\n    _MT_${sp}_held := 0\n`;
-          s += `    Critical\n    Sleep(1)\n    Sleep(1)\n    Critical 0\n`;
-          s += ST(`_MT_${sp}_chk`, '-200');
-          s += HC;
-          s += `  ${FN(`_MT_${sp}_chk`)}${G(`_MT_${sp}_held`)}    if (_MT_${sp}_held)\n      return\n`;
-          s += `    if !GetKeyState("${pn}","P")\n      return\n    _MT_${sp}_held := 1\n`;
-          s += SDW(hn); s += KW(pn); s += SUP(hn);
-          s += isV2 ? `  }\n` : `  return\n`;
-          s += `  ${HO(pn,1)}${G(`_MT_${sp}_held`)}${SO(`_MT_${sp}_chk`)}`;
-          s += `    if (!_MT_${sp}_held) {\n`;
-          s += isV2 ? `      SendInput("{Blind}${ts}")\n` : `      SendInput {Blind}${ts}\n`;
-          s += `    }\n    _MT_${sp}_held := 0\n`;
-          s += HC;
-        }
-      // === Original approach ===
-      } else if (parts[2] === 'layer') {
-        s += `, hold=MO(${parts[3]})\n  ${HO(pn,0)}`;
+      if (parts[2] === 'layer') {
+        s += `, hold=MO(${parts[3]})\n`;
+        s += `  ; Critical〜30msブロック\n`;
+        s += `  ${HO(pn,0)}`;
         s += G(`_busy_${sp}, _MT_${sp}_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer`);
         s += `    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
         s += `    _MT_${sp}_held := false\n    _MT_anykey := 0\n    _MO_count++\n`;
         s += `    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n`;
         s += `    CurrentLayer := ${parts[3]}\n`;
+        s += `    Critical\n`;
+        s += isV2 ? `    Sleep(1)\n    Sleep(1)\n    Critical 0\n` : `    Sleep, 1\n    Sleep, 1\n    Critical Off\n`;
         s += ST(`_MT_${sp}_chk`, -300);
         s += KW(pn);
         s += SO(`_MT_${sp}_chk`);
@@ -1130,6 +1090,8 @@ function buildScript(mode) {
         s += `, hold=${hn}\n`;
         s += `  ; タイマー方式：キーUPで即タップ\n`;
         s += `  ${HO(pn,0)}${G(`_MT_${sp}_held, _MT_anykey`)}    _MT_anykey := 1\n    _MT_${sp}_held := 0\n`;
+        s += `    Critical\n`;
+        s += isV2 ? `    Sleep(1)\n    Sleep(1)\n    Critical 0\n` : `    Sleep, 1\n    Sleep, 1\n    Critical Off\n`;
         s += ST(`_MT_${sp}_chk`, '-200');
         s += HC;
         s += `  ${FN(`_MT_${sp}_chk`)}${G(`_MT_${sp}_held`)}    if (_MT_${sp}_held)\n      return\n`;
