@@ -1,6 +1,6 @@
 ﻿; ============================================================
 ; KeyRemapper - AutoHotkey v2
-; 2026/7/9 21:12:42 | JIS 109（フル）
+; 2026/7/10 8:53:46 | JIS 109（フル）
 ; ============================================================
 
 #SingleInstance Force
@@ -15,12 +15,13 @@ _MO_count := 0
 ; === ガード変数 ===
 _busy_space := false
 _busy_f := false
-_busy_semicolon := false
+_busy_j := false
 
 ; === レイヤー定義 ===
 ; Layer 0: Default
 ; Layer 1: Layer 1
 ; Layer 2: Layer 2
+; Layer 3: Layer 3
 
 ; === Layer 0: Default ===
 #HotIf CurrentLayer == 0
@@ -78,32 +79,32 @@ _busy_semicolon := false
     global _MT_f_held
     _MT_f_held := true
   }
-  ; ModTap: sc027 -> tap=sc027, hold=MO(2)
-  $*sc027:: {
-    global _busy_semicolon, _MT_semicolon_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer
-    global _busy_semicolon
-    if (_busy_semicolon)
+  ; ModTap: j -> tap=j, hold=MO(3)
+  $*j:: {
+    global _busy_j, _MT_j_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer
+    global _busy_j
+    if (_busy_j)
       return
-    _busy_semicolon := true
-    _MT_semicolon_held := false
+    _busy_j := true
+    _MT_j_held := false
     _MT_anykey := 0
     _MO_count++
     if (_MO_count == 1)
       _MO_base := CurrentLayer
-    CurrentLayer := 2
-  SetTimer(_MT_semicolon_chk,-300)
-  KeyWait("sc027")
-  SetTimer(_MT_semicolon_chk,0)
+    CurrentLayer := 3
+  SetTimer(_MT_j_chk,-300)
+  KeyWait("j")
+  SetTimer(_MT_j_chk,0)
     _MO_count--
     if (_MO_count == 0)
       CurrentLayer := _MO_base
-    if (!_MT_semicolon_held && !_MT_anykey) {
-      SendInput("{Blind}{sc027}")
+    if (!_MT_j_held && !_MT_anykey) {
+      SendInput("{Blind}{j}")
     }
 }
-  _MT_semicolon_chk() {
-    global _MT_semicolon_held
-    _MT_semicolon_held := true
+  _MT_j_chk() {
+    global _MT_j_held
+    _MT_j_held := true
   }
 #HotIf
 
@@ -363,6 +364,35 @@ _busy_semicolon := false
     _MT_anykey := 1
   SendInput("{Blind}{Numpad6}")
 }
+  $*u:: {
+    global _MT_anykey
+    _MT_anykey := 1
+  SendInput("{Blind}{Numpad7}")
+}
+  $*i:: {
+    global _MT_anykey
+    _MT_anykey := 1
+  SendInput("{Blind}{Numpad8}")
+}
+  $*o:: {
+    global _MT_anykey
+    _MT_anykey := 1
+  SendInput("{Blind}{Numpad9}")
+}
+  $*p:: {
+    global _MT_anykey
+    _MT_anykey := 1
+  SendInput("{Blind}{Backspace}")
+}
+  $*sc027:: {
+    global _MT_anykey
+    _MT_anykey := 1
+  SendInput("{Blind}{NumpadEnter}")
+}
+#HotIf
+
+; === Layer 3: Layer 3 ===
+#HotIf CurrentLayer == 3
   $*q:: {
     global _MT_anykey
     _MT_anykey := 1
@@ -387,26 +417,6 @@ _busy_semicolon := false
     global _MT_anykey
     _MT_anykey := 1
   SendInput("{Blind}{F5}")
-}
-  $*u:: {
-    global _MT_anykey
-    _MT_anykey := 1
-  SendInput("{Blind}{Numpad7}")
-}
-  $*i:: {
-    global _MT_anykey
-    _MT_anykey := 1
-  SendInput("{Blind}{Numpad8}")
-}
-  $*o:: {
-    global _MT_anykey
-    _MT_anykey := 1
-  SendInput("{Blind}{Numpad9}")
-}
-  $*p:: {
-    global _MT_anykey
-    _MT_anykey := 1
-  SendInput("{Blind}{Backspace}")
 }
   $*a:: {
     global _MT_anykey
@@ -443,11 +453,6 @@ _busy_semicolon := false
     _MT_anykey := 1
   SendInput("{Blind}{F12}")
 }
-  $*sc027:: {
-    global _MT_anykey
-    _MT_anykey := 1
-  SendInput("{Blind}{NumpadEnter}")
-}
 #HotIf
 
 ; === ガードクリア（キーUP時） ===
@@ -459,9 +464,9 @@ _busy_semicolon := false
     global _busy_f
     _busy_f := false
 }
-  $*sc027 up:: {
-    global _busy_semicolon
-    _busy_semicolon := false
+  $*j up:: {
+    global _busy_j
+    _busy_j := false
 }
 
 

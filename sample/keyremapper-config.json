@@ -7,7 +7,7 @@
       "mappings": {
         "space": "modtap:space:layer:1",
         "f": "modtap:f:layer:2",
-        "semicolon": "modtap:semicolon:layer:2"
+        "j": "modtap:j:layer:3"
       }
     },
     {
@@ -166,11 +166,6 @@
         "yen": "transparent",
         "backspace": "transparent",
         "tab": "transparent",
-        "q": "f1",
-        "w": "f2",
-        "e": "f3",
-        "r": "f4",
-        "t": "f5",
         "y": "transparent",
         "u": "n7",
         "i": "n8",
@@ -180,17 +175,10 @@
         "lbracket_jis": "transparent",
         "rbracket_jis": "transparent",
         "caps": "transparent",
-        "a": "f6",
-        "s": "f7",
-        "d": "f8",
-        "f": "f9",
-        "g": "f10",
         "h": "transparent",
         "colon_jis": "transparent",
         "enter": "transparent",
         "lshift": "transparent",
-        "z": "f11",
-        "x": "f12",
         "c": "transparent",
         "v": "transparent",
         "b": "transparent",
@@ -235,7 +223,37 @@
         "nenter": "transparent",
         "n0": "transparent",
         "ndot": "transparent",
-        "semicolon": "nenter"
+        "semicolon": "nenter",
+        "q": "transparent",
+        "w": "transparent",
+        "e": "transparent",
+        "r": "transparent",
+        "t": "transparent",
+        "a": "transparent",
+        "s": "transparent",
+        "d": "transparent",
+        "f": "transparent",
+        "g": "transparent",
+        "z": "transparent",
+        "x": "transparent"
+      }
+    },
+    {
+      "name": "Layer 3",
+      "mappings": {
+        "q": "f1",
+        "w": "f2",
+        "e": "f3",
+        "r": "f4",
+        "t": "f5",
+        "a": "f6",
+        "s": "f7",
+        "d": "f8",
+        "f": "f9",
+        "g": "f10",
+        "z": "f11",
+        "x": "f12",
+        "semicolon": "none"
       }
     }
   ]

@@ -1005,14 +1005,20 @@ function buildScript(isV2) {
   s += isV2 ? `CurrentLayer := 0\n_MT_anykey := 0\n_MO_base := 0\n_MO_count := 0\n\n`
             : `global CurrentLayer := 0\nglobal _MT_anykey := 0\nglobal _MO_base := 0\nglobal _MO_count := 0\n\n`;
 
-  // ガード変数
-  const guardKeys = new Set();
+  // ガード変数（レイヤー/MO用：ブロック方式）
+  const moGuardKeys = new Set();
+  const mtHoldKeys = new Set(); // ModTap hold=key → タイマー方式（ブロック不要）
   state.layers.forEach(l => Object.entries(l.mappings).forEach(([p,m]) => {
-    if (m.startsWith('layer:') || m.startsWith('modtap:')) guardKeys.add(p);
+    if (m.startsWith('layer:')) {
+      moGuardKeys.add(p);
+    } else if (m.startsWith('modtap:')) {
+      const parts = m.split(':');
+      if (parts[2] === 'layer') { moGuardKeys.add(p); } else { mtHoldKeys.add(p); }
+    }
   }));
-  if (guardKeys.size > 0) {
+  if (moGuardKeys.size > 0) {
     s += `; === ガード変数 ===\n`;
-    guardKeys.forEach(p => { s += `_busy_${p.replace(/[^a-zA-Z0-9_]/g,'_')} := false\n`; });
+    moGuardKeys.forEach(p => { s += `_busy_${p.replace(/[^a-zA-Z0-9_]/g,'_')} := false\n`; });
     s += `\n`;
   }
 
@@ -1076,16 +1082,19 @@ function buildScript(isV2) {
                   : `    _MT_${sp}_held := true\n  return\n`;
       } else {
         const hn = ahkName(parts[2]);
-        s += `, hold=${hn}\n  ${HO(pn,0)}`;
-        s += G(`_busy_${sp}, _MT_anykey`);
-        s += `    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
-        s += `    _MT_anykey := 1\n`;
-        s += KWT(pn, '0.2');
-        s += `    if (ErrorLevel) {\n`;
+        s += `, hold=${hn}\n`;
+        s += `  ; タイマー方式：キーUPで即タップ\n`;
+        s += `  ${HO(pn,0)}${G(`_MT_${sp}_held, _MT_anykey`)}    _MT_anykey := 1\n    _MT_${sp}_held := 0\n`;
+        s += ST(`_MT_${sp}_chk`, '-200');
+        s += HC;
+        s += `  ${FN(`_MT_${sp}_chk`)}${G(`_MT_${sp}_held`)}    if (_MT_${sp}_held)\n      return\n`;
+        s += `    if !GetKeyState("${pn}","P")\n      return\n    _MT_${sp}_held := 1\n`;
         s += SDW(hn); s += KW(pn); s += SUP(hn);
-        s += `    } else {\n`;
+        s += isV2 ? `  }\n` : `  return\n`;
+        s += `  ${HO(pn,1)}${G(`_MT_${sp}_held`)}${SO(`_MT_${sp}_chk`)}`;
+        s += `    if (!_MT_${sp}_held) {\n`;
         s += isV2 ? `      SendInput("{Blind}${ts}")\n` : `      SendInput {Blind}${ts}\n`;
-        s += `    }\n`;
+        s += `    }\n    _MT_${sp}_held := 0\n`;
         s += HC;
       }
     });
@@ -1109,9 +1118,9 @@ function buildScript(isV2) {
   }
 
   // ガードクリア
-  if (guardKeys.size > 0) {
+  if (moGuardKeys.size > 0) {
     s += `; === ガードクリア（キーUP時） ===\n`;
-    guardKeys.forEach(phys => {
+    moGuardKeys.forEach(phys => {
       const kn = ahkName(phys), sf = phys.replace(/[^a-zA-Z0-9_]/g,'_');
       s += `  ${HO(kn,1)}${G(`_busy_${sf}`)}    _busy_${sf} := false\n${HC}`;
     });
