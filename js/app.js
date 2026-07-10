@@ -1083,19 +1083,17 @@ function buildScript(isV2) {
       } else {
         const hn = ahkName(parts[2]);
         s += `, hold=${hn}\n`;
-        s += `  ; タイマー方式：キーUPで即タップ\n`;
+        s += `  ; 即タップ＋長押し打ち消し方式\n`;
         s += `  ${HO(pn,0)}${G(`_MT_${sp}_held, _MT_anykey`)}    _MT_anykey := 1\n    _MT_${sp}_held := 0\n`;
+        s += isV2 ? `  SendInput("{Blind}${ts}")\n` : `  SendInput {Blind}${ts}\n`;
         s += ST(`_MT_${sp}_chk`, '-200');
         s += HC;
         s += `  ${FN(`_MT_${sp}_chk`)}${G(`_MT_${sp}_held`)}    if (_MT_${sp}_held)\n      return\n`;
         s += `    if !GetKeyState("${pn}","P")\n      return\n    _MT_${sp}_held := 1\n`;
+        s += isV2 ? `  SendInput("{Blind}{Backspace}")\n` : `  SendInput {Blind}{Backspace}\n`;
         s += SDW(hn); s += KW(pn); s += SUP(hn);
         s += isV2 ? `  }\n` : `  return\n`;
-        s += `  ${HO(pn,1)}${G(`_MT_${sp}_held`)}${SO(`_MT_${sp}_chk`)}`;
-        s += `    if (!_MT_${sp}_held) {\n`;
-        s += isV2 ? `      SendInput("{Blind}${ts}")\n` : `      SendInput {Blind}${ts}\n`;
-        s += `    }\n    _MT_${sp}_held := 0\n`;
-        s += HC;
+        s += `  ${HO(pn,1)}${G(`_MT_${sp}_held`)}${SO(`_MT_${sp}_chk`)}    _MT_${sp}_held := 0\n${HC}`;
       }
     });
 
