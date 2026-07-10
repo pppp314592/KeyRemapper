@@ -1064,13 +1064,14 @@ function buildScript(isV2) {
       s += `  ; ModTap: ${pn} -> tap=${tn}`;
       if (parts[2] === 'layer') {
         s += `, hold=MO(${parts[3]})\n`;
-        s += `  ; ~ パススルー方式：素のキーを通して順序問題を回避\n`;
-        s += isV2
-          ? `  ~$*${pn}:: {\n    global _busy_${sp}, _MT_anykey, _MO_count, _MO_base, CurrentLayer\n    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`
-          : `  ~$*${pn}::\n    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
+        s += `  ; tap文字を KeyWait より先に送出して順序問題を回避\n`;
+        s += `  ${HO(pn,0)}`;
+        s += G(`_busy_${sp}, _MT_anykey, _MO_count, _MO_base, CurrentLayer`);
+        s += `    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
         s += `    _MT_anykey := 0\n    _MO_count++\n`;
         s += `    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n`;
         s += `    CurrentLayer := ${parts[3]}\n`;
+        s += isV2 ? `  SendInput("{Blind}${ts}")\n` : `  SendInput {Blind}${ts}\n`;
         s += KW(pn);
         s += `    _MO_count--\n    if (_MO_count ${EQ} 0)\n      CurrentLayer := _MO_base\n`;
         s += HC;
@@ -1117,9 +1118,7 @@ function buildScript(isV2) {
     s += `; === ガードクリア（キーUP時） ===\n`;
     moGuardKeys.forEach(phys => {
       const kn = ahkName(phys), sf = phys.replace(/[^a-zA-Z0-9_]/g,'_');
-      s += isV2
-        ? `  ~$*${kn} up:: {\n${G(`_busy_${sf}`)}    _busy_${sf} := false\n  }\n`
-        : `  ~$*${kn} up::\n    _busy_${sf} := false\n  return\n`;
+      s += `  ${HO(kn,1)}${G(`_busy_${sf}`)}    _busy_${sf} := false\n${HC}`;
     });
     s += `\n`;
   }
