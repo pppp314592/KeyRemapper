@@ -644,7 +644,7 @@ function openRemapDialog(layerIdx, keyId) {
   if (type === 'key' && current) {
     setTimeout(() => {
       const t = document.querySelector(`.remap-key-item[data-key-id="${current}"]`);
-      if (t) t.classList.add('selected');
+      if (t) { t.classList.add('selected'); t.scrollIntoView({ block: 'nearest' }); }
       updateApplyButton();
     }, 50);
   }
