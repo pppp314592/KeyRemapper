@@ -1,6 +1,6 @@
 ﻿; ============================================================
 ; KeyRemapper - AutoHotkey v2
-; 2026/7/10 9:38:20 | JIS 109（フル）
+; 2026/7/10 9:32:52 | JIS 109（フル）
 ; ============================================================
 
 #SingleInstance Force
@@ -26,92 +26,59 @@ _busy_j := false
 ; === Layer 0: Default ===
 #HotIf CurrentLayer == 0
   ; ModTap: Space -> tap=Space, hold=MO(1)
-  ; ~ パススルー＋長押し時 Backspace 打ち消し
+  ; ~ パススルー方式：素のキーを通して順序問題を回避
   ~$*Space:: {
-    global _busy_space, _MT_space_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer
+    global _busy_space, _MT_anykey, _MO_count, _MO_base, CurrentLayer
     global _busy_space
     if (_busy_space)
       return
     _busy_space := true
-    _MT_space_held := false
     _MT_anykey := 0
     _MO_count++
     if (_MO_count == 1)
       _MO_base := CurrentLayer
     CurrentLayer := 1
-  SetTimer(_MT_space_chk,-200)
   KeyWait("Space")
-  SetTimer(_MT_space_chk,0)
     _MO_count--
     if (_MO_count == 0)
       CurrentLayer := _MO_base
 }
-  _MT_space_chk() {
-    global _MT_space_held, _MT_anykey
-    if !GetKeyState("Space","P")
-      return
-    _MT_space_held := true
-    if (!_MT_anykey)
-  SendInput("{Blind}{Backspace}")
-  }
   ; ModTap: f -> tap=f, hold=MO(2)
-  ; ~ パススルー＋長押し時 Backspace 打ち消し
+  ; ~ パススルー方式：素のキーを通して順序問題を回避
   ~$*f:: {
-    global _busy_f, _MT_f_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer
+    global _busy_f, _MT_anykey, _MO_count, _MO_base, CurrentLayer
     global _busy_f
     if (_busy_f)
       return
     _busy_f := true
-    _MT_f_held := false
     _MT_anykey := 0
     _MO_count++
     if (_MO_count == 1)
       _MO_base := CurrentLayer
     CurrentLayer := 2
-  SetTimer(_MT_f_chk,-200)
   KeyWait("f")
-  SetTimer(_MT_f_chk,0)
     _MO_count--
     if (_MO_count == 0)
       CurrentLayer := _MO_base
 }
-  _MT_f_chk() {
-    global _MT_f_held, _MT_anykey
-    if !GetKeyState("f","P")
-      return
-    _MT_f_held := true
-    if (!_MT_anykey)
-  SendInput("{Blind}{Backspace}")
-  }
   ; ModTap: j -> tap=j, hold=MO(3)
-  ; ~ パススルー＋長押し時 Backspace 打ち消し
+  ; ~ パススルー方式：素のキーを通して順序問題を回避
   ~$*j:: {
-    global _busy_j, _MT_j_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer
+    global _busy_j, _MT_anykey, _MO_count, _MO_base, CurrentLayer
     global _busy_j
     if (_busy_j)
       return
     _busy_j := true
-    _MT_j_held := false
     _MT_anykey := 0
     _MO_count++
     if (_MO_count == 1)
       _MO_base := CurrentLayer
     CurrentLayer := 3
-  SetTimer(_MT_j_chk,-200)
   KeyWait("j")
-  SetTimer(_MT_j_chk,0)
     _MO_count--
     if (_MO_count == 0)
       CurrentLayer := _MO_base
 }
-  _MT_j_chk() {
-    global _MT_j_held, _MT_anykey
-    if !GetKeyState("j","P")
-      return
-    _MT_j_held := true
-    if (!_MT_anykey)
-  SendInput("{Blind}{Backspace}")
-  }
 #HotIf
 
 ; === Layer 1: Layer 1 ===
