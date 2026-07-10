@@ -678,7 +678,12 @@ function openRemapDialog(layerIdx, keyId) {
   }
 
   document.getElementById('remap-dialog').classList.remove('hidden');
-  document.getElementById('remap-type-select').focus();
+  const ft = document.getElementById('remap-type-select').value;
+  if (ft === 'key') {
+    document.getElementById('remap-key-search').focus();
+  } else {
+    document.getElementById('remap-type-select').focus();
+  }
 }
 
 function closeRemapDialog() {
