@@ -1,6 +1,6 @@
 ﻿; ============================================================
 ; KeyRemapper - AutoHotkey v2
-; 2026/7/10 10:26:25 | JIS 109（フル）
+; 2026/7/10 10:33:51 | JIS 109（フル）
 ; ============================================================
 
 #SingleInstance Force
@@ -26,18 +26,51 @@ _busy_j := false
 ; === Layer 0: Default ===
 #HotIf CurrentLayer == 0
   ; ModTap: Space -> tap=Space, hold=MO(1)
-  ; [β] KeyWait+T30ms 即レイヤ切替
+  ; [β] 300ms polling + _MT_anykey
   $*Space:: {
-    global _busy_space, _MT_space_held, _MO_count, _MO_base, CurrentLayer
+    global _busy_space, _MT_space_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer
     global _busy_space
     if (_busy_space)
       return
     _busy_space := true
     _MT_space_held := false
-    if KeyWait("Space","T0.3") {
+    _MT_anykey := 0
+    start := A_TickCount
+    Loop {
+      if !GetKeyState("Space","P") {
+        if (_MT_anykey) {
+    _MT_space_held := true
+    _MO_count++
+    if (_MO_count == 1)
+      _MO_base := CurrentLayer
+    CurrentLayer := 1
+  KeyWait("Space")
+    _MO_count--
+    if (_MO_count == 0)
+      CurrentLayer := _MO_base
+    _busy_space := false
+          return
+        }
   SendInput("{Blind}{Space}")
-      _busy_space := false
-      return
+        _busy_space := false
+        return
+      }
+      if (_MT_anykey) {
+    _MT_space_held := true
+    _MO_count++
+    if (_MO_count == 1)
+      _MO_base := CurrentLayer
+    CurrentLayer := 1
+  KeyWait("Space")
+    _MO_count--
+    if (_MO_count == 0)
+      CurrentLayer := _MO_base
+    _busy_space := false
+        return
+      }
+      if (A_TickCount - start > 300)
+        break
+      Sleep(1)
     }
     _MT_space_held := true
     _MO_count++
@@ -51,18 +84,51 @@ _busy_j := false
     _busy_space := false
 }
   ; ModTap: f -> tap=f, hold=MO(2)
-  ; [β] KeyWait+T30ms 即レイヤ切替
+  ; [β] 300ms polling + _MT_anykey
   $*f:: {
-    global _busy_f, _MT_f_held, _MO_count, _MO_base, CurrentLayer
+    global _busy_f, _MT_f_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer
     global _busy_f
     if (_busy_f)
       return
     _busy_f := true
     _MT_f_held := false
-    if KeyWait("f","T0.3") {
+    _MT_anykey := 0
+    start := A_TickCount
+    Loop {
+      if !GetKeyState("f","P") {
+        if (_MT_anykey) {
+    _MT_f_held := true
+    _MO_count++
+    if (_MO_count == 1)
+      _MO_base := CurrentLayer
+    CurrentLayer := 2
+  KeyWait("f")
+    _MO_count--
+    if (_MO_count == 0)
+      CurrentLayer := _MO_base
+    _busy_f := false
+          return
+        }
   SendInput("{Blind}{f}")
-      _busy_f := false
-      return
+        _busy_f := false
+        return
+      }
+      if (_MT_anykey) {
+    _MT_f_held := true
+    _MO_count++
+    if (_MO_count == 1)
+      _MO_base := CurrentLayer
+    CurrentLayer := 2
+  KeyWait("f")
+    _MO_count--
+    if (_MO_count == 0)
+      CurrentLayer := _MO_base
+    _busy_f := false
+        return
+      }
+      if (A_TickCount - start > 300)
+        break
+      Sleep(1)
     }
     _MT_f_held := true
     _MO_count++
@@ -76,18 +142,51 @@ _busy_j := false
     _busy_f := false
 }
   ; ModTap: j -> tap=j, hold=MO(3)
-  ; [β] KeyWait+T30ms 即レイヤ切替
+  ; [β] 300ms polling + _MT_anykey
   $*j:: {
-    global _busy_j, _MT_j_held, _MO_count, _MO_base, CurrentLayer
+    global _busy_j, _MT_j_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer
     global _busy_j
     if (_busy_j)
       return
     _busy_j := true
     _MT_j_held := false
-    if KeyWait("j","T0.3") {
+    _MT_anykey := 0
+    start := A_TickCount
+    Loop {
+      if !GetKeyState("j","P") {
+        if (_MT_anykey) {
+    _MT_j_held := true
+    _MO_count++
+    if (_MO_count == 1)
+      _MO_base := CurrentLayer
+    CurrentLayer := 3
+  KeyWait("j")
+    _MO_count--
+    if (_MO_count == 0)
+      CurrentLayer := _MO_base
+    _busy_j := false
+          return
+        }
   SendInput("{Blind}{j}")
-      _busy_j := false
-      return
+        _busy_j := false
+        return
+      }
+      if (_MT_anykey) {
+    _MT_j_held := true
+    _MO_count++
+    if (_MO_count == 1)
+      _MO_base := CurrentLayer
+    CurrentLayer := 3
+  KeyWait("j")
+    _MO_count--
+    if (_MO_count == 0)
+      CurrentLayer := _MO_base
+    _busy_j := false
+        return
+      }
+      if (A_TickCount - start > 300)
+        break
+      Sleep(1)
     }
     _MT_j_held := true
     _MO_count++

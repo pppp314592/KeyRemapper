@@ -1065,43 +1065,45 @@ function buildScript(mode) {
       const parts = mapping.split(':');
       const pn = ahkName(phys), tn = ahkName(parts[1]), ts = `{${tn}}`, sp = phys.replace(/[^a-zA-Z0-9_]/g,'_');
       s += `  ; ModTap: ${pn} -> tap=${tn}`;
-      // === Beta: 300ms polling + _MT_anykey ===
+      // === Beta: Critical〜30msブロック + 元のSetTimer方式 ===
       if (isBeta) {
         if (parts[2] === 'layer') {
           s += `, hold=MO(${parts[3]})\n`;
-          s += `  ; [β] 300ms polling + _MT_anykey\n`;
+          s += `  ; [β] Critical〜30msブロック\n`;
           s += `  ${HO(pn,0)}`;
           s += G(`_busy_${sp}, _MT_${sp}_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer`);
           s += `    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
-          s += `    _MT_${sp}_held := false\n    _MT_anykey := 0\n    start := A_TickCount\n    Loop {\n`;
-          s += `      if !GetKeyState("${pn}","P") {\n`;
-          s += `        if (_MT_anykey) {\n    _MT_${sp}_held := true\n    _MO_count++\n    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n    CurrentLayer := ${parts[3]}\n`;
+          s += `    _MT_${sp}_held := false\n    _MT_anykey := 0\n    _MO_count++\n`;
+          s += `    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n`;
+          s += `    CurrentLayer := ${parts[3]}\n`;
+          s += `    Critical\n    Sleep(1)\n    Sleep(1)\n    Critical 0\n`;
+          s += ST(`_MT_${sp}_chk`, -300);
           s += KW(pn);
-          s += `    _MO_count--\n    if (_MO_count ${EQ} 0)\n      CurrentLayer := _MO_base\n    _busy_${sp} := false\n          return\n        }\n`;
-          s += isV2 ? `  SendInput("{Blind}${ts}")\n` : `  SendInput {Blind}${ts}\n`;
-          s += `        _busy_${sp} := false\n        return\n      }\n`;
-          s += `      if (_MT_anykey) {\n    _MT_${sp}_held := true\n    _MO_count++\n    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n    CurrentLayer := ${parts[3]}\n`;
-          s += KW(pn);
-          s += `    _MO_count--\n    if (_MO_count ${EQ} 0)\n      CurrentLayer := _MO_base\n    _busy_${sp} := false\n        return\n      }\n`;
-          s += `      if (A_TickCount - start > 300)\n        break\n`;
-          s += isV2 ? `      Sleep(1)\n    }\n` : `      Sleep, 1\n    }\n`;
-          s += `    _MT_${sp}_held := true\n    _MO_count++\n    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n    CurrentLayer := ${parts[3]}\n`;
-          s += KW(pn);
-          s += `    _MO_count--\n    if (_MO_count ${EQ} 0)\n      CurrentLayer := _MO_base\n    _busy_${sp} := false\n`;
+          s += SO(`_MT_${sp}_chk`);
+          s += `    _MO_count--\n    if (_MO_count ${EQ} 0)\n      CurrentLayer := _MO_base\n`;
+          s += `    if (!_MT_${sp}_held && !_MT_anykey) {\n`;
+          s += isV2 ? `      SendInput("{Blind}${ts}")\n` : `      SendInput {Blind}${ts}\n`;
+          s += `    }\n`;
           s += HC;
+          s += `  ${FN(`_MT_${sp}_chk`)}`;
+          s += isV2 ? `    global _MT_${sp}_held\n    _MT_${sp}_held := true\n  }\n`
+                    : `    _MT_${sp}_held := true\n  return\n`;
         } else {
           const hn = ahkName(parts[2]);
           s += `, hold=${hn}\n`;
-          s += `  ; [β] 300ms polling + _MT_anykey\n`;
-          s += `  ${HO(pn,0)}${G(`_MT_${sp}_held, _MT_anykey`)}    _MT_${sp}_held := 0\n    _MT_anykey := 0\n    start := A_TickCount\n    Loop {\n`;
-          s += `      if !GetKeyState("${pn}","P") {\n`;
-          s += `        if (_MT_anykey) {\n${SDW(hn)}${KW(pn)}${SUP(hn)}          return\n        }\n`;
-          s += isV2 ? `  SendInput("{Blind}${ts}")\n` : `  SendInput {Blind}${ts}\n`;
-          s += `        return\n      }\n`;
-          s += `      if (_MT_anykey) {\n${SDW(hn)}${KW(pn)}${SUP(hn)}        return\n      }\n`;
-          s += `      if (A_TickCount - start > 300)\n        break\n`;
-          s += isV2 ? `      Sleep(1)\n    }\n` : `      Sleep, 1\n    }\n`;
+          s += `  ; [β] Critical〜30msブロック\n`;
+          s += `  ${HO(pn,0)}${G(`_MT_${sp}_held, _MT_anykey`)}    _MT_anykey := 1\n    _MT_${sp}_held := 0\n`;
+          s += `    Critical\n    Sleep(1)\n    Sleep(1)\n    Critical 0\n`;
+          s += ST(`_MT_${sp}_chk`, '-200');
+          s += HC;
+          s += `  ${FN(`_MT_${sp}_chk`)}${G(`_MT_${sp}_held`)}    if (_MT_${sp}_held)\n      return\n`;
+          s += `    if !GetKeyState("${pn}","P")\n      return\n    _MT_${sp}_held := 1\n`;
           s += SDW(hn); s += KW(pn); s += SUP(hn);
+          s += isV2 ? `  }\n` : `  return\n`;
+          s += `  ${HO(pn,1)}${G(`_MT_${sp}_held`)}${SO(`_MT_${sp}_chk`)}`;
+          s += `    if (!_MT_${sp}_held) {\n`;
+          s += isV2 ? `      SendInput("{Blind}${ts}")\n` : `      SendInput {Blind}${ts}\n`;
+          s += `    }\n    _MT_${sp}_held := 0\n`;
           s += HC;
         }
       // === Original approach ===
