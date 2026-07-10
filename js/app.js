@@ -678,6 +678,7 @@ function openRemapDialog(layerIdx, keyId) {
   }
 
   document.getElementById('remap-dialog').classList.remove('hidden');
+  document.getElementById('remap-type-select').focus();
 }
 
 function closeRemapDialog() {
