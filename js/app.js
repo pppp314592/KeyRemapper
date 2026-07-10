@@ -1076,8 +1076,9 @@ function buildScript(mode) {
           s += `    _MT_${sp}_held := false\n    Critical\n    Loop 30 {\n`;
           s += isV2 ? `      if !GetKeyState("${pn}","P") {\n` : `      if !GetKeyState("${pn}","P") {\n`;
           s += isV2 ? `  SendInput("{Blind}${ts}")\n` : `  SendInput {Blind}${ts}\n`;
-          s += `        Critical Off\n        _busy_${sp} := false\n        return\n      }\n`;
-          s += isV2 ? `      Sleep(-1)\n    }\n    Critical Off\n` : `      Sleep, -1\n    }\n    Critical Off\n`;
+          s += isV2 ? `        Critical 0\n` : `        Critical Off\n`;
+          s += `        _busy_${sp} := false\n        return\n      }\n`;
+          s += isV2 ? `      Sleep(-1)\n    }\n    Critical 0\n` : `      Sleep, -1\n    }\n    Critical Off\n`;
           s += `    _MT_${sp}_held := true\n    _MO_count++\n`;
           s += `    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n`;
           s += `    CurrentLayer := ${parts[3]}\n`;
@@ -1093,8 +1094,9 @@ function buildScript(mode) {
           s += `    Critical\n    Loop 30 {\n`;
           s += isV2 ? `      if !GetKeyState("${pn}","P") {\n` : `      if !GetKeyState("${pn}","P") {\n`;
           s += isV2 ? `  SendInput("{Blind}${ts}")\n` : `  SendInput {Blind}${ts}\n`;
-          s += `        Critical Off\n        return\n      }\n`;
-          s += isV2 ? `      Sleep(-1)\n    }\n    Critical Off\n` : `      Sleep, -1\n    }\n    Critical Off\n`;
+          s += isV2 ? `        Critical 0\n` : `        Critical Off\n`;
+          s += `        return\n      }\n`;
+          s += isV2 ? `      Sleep(-1)\n    }\n    Critical 0\n` : `      Sleep, -1\n    }\n    Critical Off\n`;
           s += `    _MT_${sp}_held := 1\n`;
           s += SDW(hn); s += KW(pn); s += SUP(hn);
           s += HC;

@@ -1,6 +1,6 @@
 ﻿; ============================================================
 ; KeyRemapper - AutoHotkey v2
-; 2026/7/10 9:59:26 | JIS 109（フル）
+; 2026/7/10 10:12:00 | JIS 109（フル）
 ; ============================================================
 
 #SingleInstance Force
@@ -26,86 +26,98 @@ _busy_j := false
 ; === Layer 0: Default ===
 #HotIf CurrentLayer == 0
   ; ModTap: Space -> tap=Space, hold=MO(1)
+  ; [β] Critical+30ms 即レイヤ切替
   $*Space:: {
-    global _busy_space, _MT_space_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer
+    global _busy_space, _MT_space_held, _MO_count, _MO_base, CurrentLayer
     global _busy_space
     if (_busy_space)
       return
     _busy_space := true
     _MT_space_held := false
-    _MT_anykey := 0
+    Critical
+    Loop 30 {
+      if !GetKeyState("Space","P") {
+  SendInput("{Blind}{Space}")
+        Critical Off
+        _busy_space := false
+        return
+      }
+      Sleep(-1)
+    }
+    Critical Off
+    _MT_space_held := true
     _MO_count++
     if (_MO_count == 1)
       _MO_base := CurrentLayer
     CurrentLayer := 1
-  SetTimer(_MT_space_chk,-300)
   KeyWait("Space")
-  SetTimer(_MT_space_chk,0)
     _MO_count--
     if (_MO_count == 0)
       CurrentLayer := _MO_base
-    if (!_MT_space_held && !_MT_anykey) {
-      SendInput("{Blind}{Space}")
-    }
+    _busy_space := false
 }
-  _MT_space_chk() {
-    global _MT_space_held
-    _MT_space_held := true
-  }
   ; ModTap: f -> tap=f, hold=MO(2)
+  ; [β] Critical+30ms 即レイヤ切替
   $*f:: {
-    global _busy_f, _MT_f_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer
+    global _busy_f, _MT_f_held, _MO_count, _MO_base, CurrentLayer
     global _busy_f
     if (_busy_f)
       return
     _busy_f := true
     _MT_f_held := false
-    _MT_anykey := 0
+    Critical
+    Loop 30 {
+      if !GetKeyState("f","P") {
+  SendInput("{Blind}{f}")
+        Critical Off
+        _busy_f := false
+        return
+      }
+      Sleep(-1)
+    }
+    Critical Off
+    _MT_f_held := true
     _MO_count++
     if (_MO_count == 1)
       _MO_base := CurrentLayer
     CurrentLayer := 2
-  SetTimer(_MT_f_chk,-300)
   KeyWait("f")
-  SetTimer(_MT_f_chk,0)
     _MO_count--
     if (_MO_count == 0)
       CurrentLayer := _MO_base
-    if (!_MT_f_held && !_MT_anykey) {
-      SendInput("{Blind}{f}")
-    }
+    _busy_f := false
 }
-  _MT_f_chk() {
-    global _MT_f_held
-    _MT_f_held := true
-  }
   ; ModTap: j -> tap=j, hold=MO(3)
+  ; [β] Critical+30ms 即レイヤ切替
   $*j:: {
-    global _busy_j, _MT_j_held, _MT_anykey, _MO_count, _MO_base, CurrentLayer
+    global _busy_j, _MT_j_held, _MO_count, _MO_base, CurrentLayer
     global _busy_j
     if (_busy_j)
       return
     _busy_j := true
     _MT_j_held := false
-    _MT_anykey := 0
+    Critical
+    Loop 30 {
+      if !GetKeyState("j","P") {
+  SendInput("{Blind}{j}")
+        Critical Off
+        _busy_j := false
+        return
+      }
+      Sleep(-1)
+    }
+    Critical Off
+    _MT_j_held := true
     _MO_count++
     if (_MO_count == 1)
       _MO_base := CurrentLayer
     CurrentLayer := 3
-  SetTimer(_MT_j_chk,-300)
   KeyWait("j")
-  SetTimer(_MT_j_chk,0)
     _MO_count--
     if (_MO_count == 0)
       CurrentLayer := _MO_base
-    if (!_MT_j_held && !_MT_anykey) {
-      SendInput("{Blind}{j}")
-    }
+    _busy_j := false
 }
-  _MT_j_chk() {
-    global _MT_j_held
-    _MT_j_held := true
-  }
 #HotIf
 
 ; === Layer 1: Layer 1 ===
