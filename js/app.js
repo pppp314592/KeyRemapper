@@ -1099,7 +1099,7 @@ function buildScript(mode) {
       s += `    _MO_count++\n    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n`;
       s += `    CurrentLayer := ${tl}\n    _MT_anykey := 1\n`;
       s += KW(kn);
-      s += `    _MO_count--\n    if (_MO_count ${EQ} 0)\n      CurrentLayer := _MO_base\n`;
+      s += `    _MO_count--\n    if (_MO_count ${EQ} 0)\n      CurrentLayer := _MO_base\n    _busy_${sp} := false\n`;
       s += HC;
     });
 
@@ -1124,7 +1124,7 @@ function buildScript(mode) {
         s += `    _MO_count--\n    if (_MO_count ${EQ} 0)\n      CurrentLayer := _MO_base\n`;
         s += `    if (!_MT_${sp}_held && !_MT_anykey) {\n`;
         s += isV2 ? `      SendInput("{Blind}${ts}")\n` : `      SendInput {Blind}${ts}\n`;
-        s += `    }\n`;
+        s += `    }\n    _busy_${sp} := false\n`;
         s += HC;
         s += `  ${FN(`_MT_${sp}_chk`)}`;
         s += isV2 ? `    global _MT_${sp}_held\n    _MT_${sp}_held := true\n  }\n`
@@ -1166,16 +1166,6 @@ function buildScript(mode) {
     }
 
     s += isV2 ? `#HotIf\n\n` : `#If\n\n`;
-  }
-
-  // ガードクリア
-  if (moGuardKeys.size > 0) {
-    s += `; === ガードクリア（キーUP時） ===\n`;
-    moGuardKeys.forEach(phys => {
-      const kn = ahkName(phys), sf = phys.replace(/[^a-zA-Z0-9_]/g,'_');
-      s += `  ${HO(kn,1)}${G(`_busy_${sf}`)}    _busy_${sf} := false\n${HC}`;
-    });
-    s += `\n`;
   }
 
   s += `\n; === 以上 自動生成 ===\n`;

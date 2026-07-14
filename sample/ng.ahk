@@ -1,6 +1,6 @@
 ﻿; ============================================================
 ; KeyRemapper - AutoHotkey v2
-; 2026/7/14 9:36:57 | JIS 109（フル）
+; 2026/7/14 18:31:33 | JIS 109（フル）
 ; ============================================================
 
 #SingleInstance Force
@@ -16,6 +16,7 @@ _MO_count := 0
 _busy_space := false
 _busy_caret := false
 _busy_q := false
+_busy_v := false
 
 ; === レイヤー定義 ===
 ; Layer 0: Default
@@ -349,6 +350,22 @@ _busy_q := false
 
 ; === Layer 2: Layer 2 ===
 #HotIf CurrentLayer == 2
+  $*v:: {
+    global _busy_v, _MT_anykey, _MO_count, _MO_base, CurrentLayer
+    global _busy_v
+    if (_busy_v)
+      return
+    _busy_v := true
+    _MO_count++
+    if (_MO_count == 1)
+      _MO_base := CurrentLayer
+    CurrentLayer := 3
+    _MT_anykey := 1
+  KeyWait("v")
+    _MO_count--
+    if (_MO_count == 0)
+      CurrentLayer := _MO_base
+}
   $*Space:: {
     global _MT_anykey
     _MT_anykey := 1
@@ -492,6 +509,10 @@ _busy_q := false
   $*q up:: {
     global _busy_q
     _busy_q := false
+}
+  $*v up:: {
+    global _busy_v
+    _busy_v := false
 }
 
 
