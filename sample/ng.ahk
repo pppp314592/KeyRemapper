@@ -1,6 +1,6 @@
 ﻿; ============================================================
 ; KeyRemapper - AutoHotkey v2
-; 2026/7/14 18:31:33 | JIS 109（フル）
+; 2026/7/14 18:44:38 | JIS 109（フル）
 ; ============================================================
 
 #SingleInstance Force
@@ -53,6 +53,7 @@ _busy_v := false
     if (!_MT_space_held && !_MT_anykey) {
       SendInput("{Blind}{Space}")
     }
+    _busy_space := false
 }
   _MT_space_chk() {
     global _MT_space_held
@@ -85,6 +86,7 @@ _busy_v := false
     if (!_MT_caret_held && !_MT_anykey) {
       SendInput("{Blind}{sc00d}")
     }
+    _busy_caret := false
 }
   _MT_caret_chk() {
     global _MT_caret_held
@@ -117,6 +119,7 @@ _busy_v := false
     if (!_MT_q_held && !_MT_anykey) {
       SendInput("{Blind}{q}")
     }
+    _busy_q := false
 }
   _MT_q_chk() {
     global _MT_q_held
@@ -365,6 +368,7 @@ _busy_v := false
     _MO_count--
     if (_MO_count == 0)
       CurrentLayer := _MO_base
+    _busy_v := false
 }
   $*Space:: {
     global _MT_anykey
@@ -496,24 +500,6 @@ _busy_v := false
   SendInput("{Blind}{F12}")
 }
 #HotIf
-
-; === ガードクリア（キーUP時） ===
-  $*Space up:: {
-    global _busy_space
-    _busy_space := false
-}
-  $*sc00d up:: {
-    global _busy_caret
-    _busy_caret := false
-}
-  $*q up:: {
-    global _busy_q
-    _busy_q := false
-}
-  $*v up:: {
-    global _busy_v
-    _busy_v := false
-}
 
 
 ; === 以上 自動生成 ===

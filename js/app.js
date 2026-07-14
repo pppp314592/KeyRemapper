@@ -1168,6 +1168,18 @@ function buildScript(mode) {
     s += isV2 ? `#HotIf\n\n` : `#If\n\n`;
   }
 
+  // キーリピート抑制（MO/ModTap MO の _busy_* ガード変数が真の間、キーリピートを消費）
+  if (moGuardKeys.size > 0) {
+    s += isV2 ? `; === キーリピート抑制 ===\n` : `; === キーリピート抑制 ===\n`;
+    moGuardKeys.forEach(phys => {
+      const kn = ahkName(phys), sf = phys.replace(/[^a-zA-Z0-9_]/g,'_');
+      s += isV2 ? `#HotIf _busy_${sf}\n` : `#If _busy_${sf}\n`;
+      s += `  ${HO(kn,0)}${HC}`;
+      s += isV2 ? `#HotIf\n` : `#If\n`;
+    });
+    s += `\n`;
+  }
+
   s += `\n; === 以上 自動生成 ===\n`;
   return s;
 }
