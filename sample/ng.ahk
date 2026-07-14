@@ -1,6 +1,6 @@
 ﻿; ============================================================
 ; KeyRemapper - AutoHotkey v2
-; 2026/7/14 18:53:30 | JIS 109（フル）
+; 2026/7/14 20:46:53 | JIS 109（フル）
 ; ============================================================
 
 #SingleInstance Force
@@ -39,6 +39,7 @@ _busy_v := false
     _MO_count++
     if (_MO_count == 1)
       _MO_base := CurrentLayer
+    _prev := CurrentLayer
     CurrentLayer := 1
     Critical
     Sleep(1)
@@ -47,9 +48,8 @@ _busy_v := false
   SetTimer(_MT_space_chk,-300)
   KeyWait("Space")
   SetTimer(_MT_space_chk,0)
+    CurrentLayer := _prev
     _MO_count--
-    if (_MO_count == 0)
-      CurrentLayer := _MO_base
     if (!_MT_space_held && !_MT_anykey) {
       SendInput("{Blind}{Space}")
     }
@@ -72,6 +72,7 @@ _busy_v := false
     _MO_count++
     if (_MO_count == 1)
       _MO_base := CurrentLayer
+    _prev := CurrentLayer
     CurrentLayer := 3
     Critical
     Sleep(1)
@@ -80,9 +81,8 @@ _busy_v := false
   SetTimer(_MT_caret_chk,-300)
   KeyWait("sc00d")
   SetTimer(_MT_caret_chk,0)
+    CurrentLayer := _prev
     _MO_count--
-    if (_MO_count == 0)
-      CurrentLayer := _MO_base
     if (!_MT_caret_held && !_MT_anykey) {
       SendInput("{Blind}{sc00d}")
     }
@@ -105,6 +105,7 @@ _busy_v := false
     _MO_count++
     if (_MO_count == 1)
       _MO_base := CurrentLayer
+    _prev := CurrentLayer
     CurrentLayer := 2
     Critical
     Sleep(1)
@@ -113,9 +114,8 @@ _busy_v := false
   SetTimer(_MT_q_chk,-300)
   KeyWait("q")
   SetTimer(_MT_q_chk,0)
+    CurrentLayer := _prev
     _MO_count--
-    if (_MO_count == 0)
-      CurrentLayer := _MO_base
     if (!_MT_q_held && !_MT_anykey) {
       SendInput("{Blind}{q}")
     }
@@ -138,12 +138,12 @@ _busy_v := false
     _MO_count++
     if (_MO_count == 1)
       _MO_base := CurrentLayer
+    _prev := CurrentLayer
     CurrentLayer := 2
     _MT_anykey := 1
   KeyWait("v")
+    CurrentLayer := _prev
     _MO_count--
-    if (_MO_count == 0)
-      CurrentLayer := _MO_base
     _busy_v := false
 }
   $*0:: {
