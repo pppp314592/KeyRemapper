@@ -1,6 +1,6 @@
 ﻿; ============================================================
 ; KeyRemapper - AutoHotkey v2
-; 2026/7/14 18:44:38 | JIS 109（フル）
+; 2026/7/14 18:53:30 | JIS 109（フル）
 ; ============================================================
 
 #SingleInstance Force
@@ -129,6 +129,23 @@ _busy_v := false
 
 ; === Layer 1: Layer 1 ===
 #HotIf CurrentLayer == 1
+  $*v:: {
+    global _busy_v, _MT_anykey, _MO_count, _MO_base, CurrentLayer
+    global _busy_v
+    if (_busy_v)
+      return
+    _busy_v := true
+    _MO_count++
+    if (_MO_count == 1)
+      _MO_base := CurrentLayer
+    CurrentLayer := 2
+    _MT_anykey := 1
+  KeyWait("v")
+    _MO_count--
+    if (_MO_count == 0)
+      CurrentLayer := _MO_base
+    _busy_v := false
+}
   $*0:: {
     global _MT_anykey
     _MT_anykey := 1
@@ -353,23 +370,6 @@ _busy_v := false
 
 ; === Layer 2: Layer 2 ===
 #HotIf CurrentLayer == 2
-  $*v:: {
-    global _busy_v, _MT_anykey, _MO_count, _MO_base, CurrentLayer
-    global _busy_v
-    if (_busy_v)
-      return
-    _busy_v := true
-    _MO_count++
-    if (_MO_count == 1)
-      _MO_base := CurrentLayer
-    CurrentLayer := 3
-    _MT_anykey := 1
-  KeyWait("v")
-    _MO_count--
-    if (_MO_count == 0)
-      CurrentLayer := _MO_base
-    _busy_v := false
-}
   $*Space:: {
     global _MT_anykey
     _MT_anykey := 1
@@ -498,6 +498,24 @@ _busy_v := false
     global _MT_anykey
     _MT_anykey := 1
   SendInput("{Blind}{F12}")
+}
+#HotIf
+
+; === キーリピート抑制 ===
+#HotIf _busy_space
+  $*Space:: {
+}
+#HotIf
+#HotIf _busy_caret
+  $*sc00d:: {
+}
+#HotIf
+#HotIf _busy_q
+  $*q:: {
+}
+#HotIf
+#HotIf _busy_v
+  $*v:: {
 }
 #HotIf
 

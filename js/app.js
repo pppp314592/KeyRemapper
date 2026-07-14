@@ -1097,9 +1097,9 @@ function buildScript(mode) {
       s += G(`_busy_${sp}, _MT_anykey, _MO_count, _MO_base, CurrentLayer`);
       s += `    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
       s += `    _MO_count++\n    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n`;
-      s += `    CurrentLayer := ${tl}\n    _MT_anykey := 1\n`;
+      s += `    _prev := CurrentLayer\n    CurrentLayer := ${tl}\n    _MT_anykey := 1\n`;
       s += KW(kn);
-      s += `    _MO_count--\n    if (_MO_count ${EQ} 0)\n      CurrentLayer := _MO_base\n    _busy_${sp} := false\n`;
+      s += `    CurrentLayer := _prev\n    _MO_count--\n    _busy_${sp} := false\n`;
       s += HC;
     });
 
@@ -1115,13 +1115,13 @@ function buildScript(mode) {
         s += `    global _busy_${sp}\n    if (_busy_${sp})\n      return\n    _busy_${sp} := true\n`;
         s += `    _MT_${sp}_held := false\n    _MT_anykey := 0\n    _MO_count++\n`;
         s += `    if (_MO_count ${EQ} 1)\n      _MO_base := CurrentLayer\n`;
-        s += `    CurrentLayer := ${parts[3]}\n`;
+        s += `    _prev := CurrentLayer\n    CurrentLayer := ${parts[3]}\n`;
         s += `    Critical\n`;
         s += isV2 ? `    Sleep(1)\n    Sleep(1)\n    Critical 0\n` : `    Sleep, 1\n    Sleep, 1\n    Critical Off\n`;
         s += ST(`_MT_${sp}_chk`, -300);
         s += KW(pn);
         s += SO(`_MT_${sp}_chk`);
-        s += `    _MO_count--\n    if (_MO_count ${EQ} 0)\n      CurrentLayer := _MO_base\n`;
+        s += `    CurrentLayer := _prev\n    _MO_count--\n`;
         s += `    if (!_MT_${sp}_held && !_MT_anykey) {\n`;
         s += isV2 ? `      SendInput("{Blind}${ts}")\n` : `      SendInput {Blind}${ts}\n`;
         s += `    }\n    _busy_${sp} := false\n`;
